@@ -1,0 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background: #14151a;
+  font-family: 'Assistant', system-ui, sans-serif;
+  overflow: hidden;
+}
+
+input, textarea {
+  font-family: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+.leaflet-container {
+  background: #14151a;
+  font-family: 'Assistant', system-ui, sans-serif;
+}
+
+.opsmap-xmark {
+  color: #ff5c5c;
+  font-size: 11px;
+  font-weight: 700;
+  text-shadow: 0 0 3px #000, 0 0 3px #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+}
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.pill-btn {
+  cursor: pointer;
+}
+.pill-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.search-box:hover {
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+}
+
+.doc-add-btn:hover {
+  background: rgba(24, 110, 255, 0.28) !important;
+}
+
+.report-link:hover {
+  color: #ff4d4f !important;
+}
+
+.suggested-q:hover {
+  background: #2b2e34 !important;
+}
+
+.graphs-toggle:hover {
+  background: rgba(24, 110, 255, 0.18) !important;
+}
+
+.event-row:hover {
+  background: #34383f !important;
+}
+
+.opsmap-tag {
+  font: 600 9px/1 'Assistant', sans-serif;
+  color: #e7edf7;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 3px;
+  padding: 1px 4px;
+  white-space: nowrap;
+  transform: translate(-8px, -6px);
+}
