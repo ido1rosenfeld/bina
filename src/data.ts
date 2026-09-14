@@ -92,10 +92,11 @@ export interface ChatMessage {
   text: string;
   estimate?: boolean;
   source?: string;
+  time?: string;
 }
 
 export const INITIAL_MESSAGES: ChatMessage[] = [
-  { who: 'ai', text: 'תמונת המצב מוצגת מעל. אפשר לשאול בשפה חופשית על הפוליגון ועל טווח הזמנים שנבחרו.' },
+  { who: 'ai', text: 'תמונת המצב מוצגת מעל. אפשר לשאול בשפה חופשית על הפוליגון ועל טווח הזמנים שנבחרו.', time: '08:15' },
 ];
 
 export function answerFor(q: string): Omit<ChatMessage, 'who'> {

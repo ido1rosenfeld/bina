@@ -94,6 +94,11 @@ input, textarea {
   background: #34383f !important;
 }
 
+.msg-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #c8d0dd;
+}
+
 .opsmap-tag {
   font: 600 9px/1 'Assistant', sans-serif;
   color: #e7edf7;

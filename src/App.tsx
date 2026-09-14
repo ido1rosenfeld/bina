@@ -83,9 +83,11 @@ export default function App() {
     const q = text.trim();
     if (!q) return;
     const reply = answerFor(q);
+    const now = new Date();
+    const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     setDraft('');
     setChatOpen(true);
-    setMessages((s) => [...s, { who: 'me', text: q }, { who: 'ai', ...reply }]);
+    setMessages((s) => [...s, { who: 'me', text: q, time }, { who: 'ai', ...reply, time }]);
   }
 
   function submitReport() {

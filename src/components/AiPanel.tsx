@@ -57,6 +57,92 @@ function FactSpan({ children, onClick, color = '#9ec3ff' }: { children: ReactNod
   );
 }
 
+function BotAvatar() {
+  return (
+    <div
+      style={{
+        flex: '0 0 24px',
+        width: 24,
+        height: 24,
+        borderRadius: '50%',
+        background: 'linear-gradient(#3d8bff,#1d5fd6)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 0 0 1px rgba(255,255,255,.1)',
+      }}
+    >
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 3.5a4 4 0 0 1 4 4v.6a4 4 0 0 1 1.5 6.8V17a5.5 5.5 0 0 1-11 0v-2.1A4 4 0 0 1 8 8.1V7.5a4 4 0 0 1 4-4Z" />
+      </svg>
+    </div>
+  );
+}
+
+function UserAvatar() {
+  return (
+    <div
+      style={{
+        flex: '0 0 24px',
+        width: 24,
+        height: 24,
+        borderRadius: '50%',
+        background: '#3a3d44',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c8d0dd" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="8" r="3.2" />
+        <path d="M5 20c1.2-3.6 4-5.4 7-5.4s5.8 1.8 7 5.4" />
+      </svg>
+    </div>
+  );
+}
+
+function MsgIconBtn({ title, onClick, children }: { title: string; onClick?: () => void; children: ReactNode }) {
+  return (
+    <span
+      title={title}
+      onClick={onClick}
+      className="msg-icon-btn"
+      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 20, height: 20, borderRadius: 5, color: '#7d8492', cursor: 'pointer' }}
+    >
+      {children}
+    </span>
+  );
+}
+
+function MessageActions({ text }: { text: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+      <MsgIconBtn title="העתק" onClick={() => navigator.clipboard?.writeText(text)}>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+          <rect x="9" y="9" width="12" height="12" rx="2" />
+          <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+        </svg>
+      </MsgIconBtn>
+      <MsgIconBtn title="שתף">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 3v12M7 8l5-5 5 5" />
+          <path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" />
+        </svg>
+      </MsgIconBtn>
+      <MsgIconBtn title="מועיל">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M7 11v9H4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3Zm0 0 3.5-7A2 2 0 0 1 12 3v0a2 2 0 0 1 2 2.2L13.5 9H19a2 2 0 0 1 2 2.3l-1.1 7A2 2 0 0 1 17.9 20H10a3 3 0 0 1-3-3v-6Z" />
+        </svg>
+      </MsgIconBtn>
+      <MsgIconBtn title="לא מועיל">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" style={{ transform: 'rotate(180deg)' }}>
+          <path d="M7 11v9H4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3Zm0 0 3.5-7A2 2 0 0 1 12 3v0a2 2 0 0 1 2 2.2L13.5 9H19a2 2 0 0 1 2 2.3l-1.1 7A2 2 0 0 1 17.9 20H10a3 3 0 0 1-3-3v-6Z" />
+        </svg>
+      </MsgIconBtn>
+    </div>
+  );
+}
+
 export default function AiPanel(props: AiPanelProps) {
   const {
     panelW,
@@ -334,32 +420,47 @@ export default function AiPanel(props: AiPanelProps) {
               ✕
             </span>
           </div>
-          <div style={{ flex: '0 0 auto', maxHeight: 126, overflowY: 'auto', padding: '9px 12px', display: 'flex', flexDirection: 'column', gap: 7 }}>
+          <div style={{ flex: '0 0 auto', maxHeight: 260, overflowY: 'auto', padding: '9px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
             {messages.map((m, i) => {
               const isMe = m.who === 'me';
-              return (
+              const bubble = (
                 <div
-                  key={i}
+                  dir="rtl"
                   style={{
-                    alignSelf: isMe ? 'flex-start' : 'flex-end',
-                    maxWidth: '90%',
-                    padding: '6px 9px',
-                    borderRadius: 9,
-                    background: isMe ? '#2b2e34' : 'rgba(24,110,255,.1)',
-                    border: `1px solid ${isMe ? 'rgba(255,255,255,.09)' : '#2f5d8a'}`,
+                    padding: '7px 10px',
+                    borderRadius: 11,
+                    background: isMe ? 'rgba(255,255,255,.05)' : '#e9f0fb',
+                    boxShadow: isMe ? 'none' : '0 1px 3px rgba(0,0,0,.25)',
                   }}
                 >
+                  {m.time && (
+                    <div style={{ font: '400 9px Assistant,sans-serif', color: isMe ? '#8F91A0' : '#7b8598', marginBottom: 2, textAlign: 'right' }}>{m.time}</div>
+                  )}
                   {m.estimate && (
                     <span style={{ display: 'inline-block', marginBottom: 3, padding: '1px 6px', borderRadius: 4, background: 'rgba(245,165,36,.16)', border: '1px solid #8a6a20', font: '700 9px Assistant,sans-serif', color: '#f5a524' }}>
                       הערכה בלבד
                     </span>
                   )}
-                  <div style={{ font: '400 11px/1.5 Assistant,sans-serif', color: '#E6F5FF' }}>{m.text}</div>
+                  <div style={{ font: '400 11px/1.5 Assistant,sans-serif', color: isMe ? '#E6F5FF' : '#3c4457' }}>{m.text}</div>
                   {m.source && (
-                    <span onClick={() => onOpenSource(m.source!)} style={{ display: 'inline-block', marginTop: 3, font: '500 10px Assistant,sans-serif', color: '#9ec3ff', cursor: 'pointer' }}>
+                    <span onClick={() => onOpenSource(m.source!)} style={{ display: 'inline-block', marginTop: 3, font: '500 10px Assistant,sans-serif', color: isMe ? '#9ec3ff' : '#3169c9', cursor: 'pointer' }}>
                       {`מקור: ${m.source}`}
                     </span>
                   )}
+                </div>
+              );
+              return (
+                <div key={i} style={{ direction: 'ltr', display: 'flex', justifyContent: isMe ? 'flex-end' : 'flex-start', gap: 8 }}>
+                  {!isMe && <BotAvatar />}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 5, maxWidth: '82%' }}>
+                    {bubble}
+                    {!isMe && (
+                      <div style={{ direction: 'rtl' }}>
+                        <MessageActions text={m.text} />
+                      </div>
+                    )}
+                  </div>
+                  {isMe && <UserAvatar />}
                 </div>
               );
             })}
