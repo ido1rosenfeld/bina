@@ -9,8 +9,10 @@ interface FilterBarProps {
   toggleLayer: (key: string) => void;
 }
 
-const ROW1_KEYS = ['sabotage', 'detect', 'targets', 'reports'];
-const ROW2_KEYS = ['history', 'capture', 'infra', 'tahak', 'events', 'aman'];
+const ADV_ROW1 = ['aman', 'doc', 'heat'];
+const ADV_ROW2 = ['history', 'shield'];
+const STAT_ROW1 = ['infra', 'events', 'reports', 'detect'];
+const STAT_ROW2 = ['capture', 'targets', 'tahak', 'sabotage'];
 
 export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggleLayer }: FilterBarProps) {
   return (
@@ -120,8 +122,8 @@ export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggle
             boxShadow: '0 20px 70px rgba(0,0,0,.5)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 14 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <Pill>
                 <TableIcon />
                 טבלת ישויות
@@ -131,7 +133,7 @@ export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggle
                 סינונים רוחביים
               </Pill>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
               <ToolIconBtn onClick={toggleDoc} active={docOpen} title="תיעוד מבצעי">
                 <PencilIcon />
               </ToolIconBtn>
@@ -144,24 +146,42 @@ export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggle
             </div>
           </div>
 
-          <div style={{ direction: 'ltr', display: 'flex', alignItems: 'stretch', gap: 10 }}>
-            <DocTile on={docOpen} onClick={toggleDoc} />
-            <HeatTile on={!!layers.heat} onClick={() => toggleLayer('heat')} />
-            <div style={{ width: 1, alignSelf: 'stretch', background: 'rgba(255,255,255,.1)' }} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: '1 1 auto' }}>
-              <div style={{ display: 'flex', gap: 10 }}>
-                {ROW1_KEYS.map((key) => {
-                  const def = LAYERS.find((l) => l.key === key);
-                  if (!def) return null;
-                  return <StatTile key={key} def={def} on={!!layers[key]} onClick={() => toggleLayer(key)} />;
-                })}
+          <div style={{ direction: 'ltr', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              <span style={{ font: '600 9.5px Assistant,sans-serif', color: '#8f97a6', letterSpacing: '.02em' }}>יכולות מתקדמות</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                <div style={{ display: 'flex', gap: 5 }}>
+                  {ADV_ROW1.map((key) => (
+                    <AdvTile key={key} tileKey={key} layers={layers} docOpen={docOpen} toggleDoc={toggleDoc} toggleLayer={toggleLayer} />
+                  ))}
+                </div>
+                <div style={{ display: 'flex', gap: 5 }}>
+                  {ADV_ROW2.map((key) => (
+                    <AdvTile key={key} tileKey={key} layers={layers} docOpen={docOpen} toggleDoc={toggleDoc} toggleLayer={toggleLayer} />
+                  ))}
+                </div>
               </div>
-              <div style={{ display: 'flex', gap: 10 }}>
-                {ROW2_KEYS.map((key) => {
-                  const def = LAYERS.find((l) => l.key === key);
-                  if (!def) return null;
-                  return <StatTile key={key} def={def} on={!!layers[key]} onClick={() => toggleLayer(key)} icon={key === 'aman' ? <AmanIcon color={def.color} /> : undefined} />;
-                })}
+            </div>
+
+            <div style={{ width: 1, alignSelf: 'stretch', background: 'rgba(255,255,255,.1)' }} />
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              <span style={{ font: '600 9.5px Assistant,sans-serif', color: '#8f97a6', letterSpacing: '.02em' }}>צד</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                <div style={{ display: 'flex', gap: 5 }}>
+                  {STAT_ROW1.map((key) => {
+                    const def = LAYERS.find((l) => l.key === key);
+                    if (!def) return null;
+                    return <StatTile key={key} def={def} on={!!layers[key]} onClick={() => toggleLayer(key)} />;
+                  })}
+                </div>
+                <div style={{ display: 'flex', gap: 5 }}>
+                  {STAT_ROW2.map((key) => {
+                    const def = LAYERS.find((l) => l.key === key);
+                    if (!def) return null;
+                    return <StatTile key={key} def={def} on={!!layers[key]} onClick={() => toggleLayer(key)} />;
+                  })}
+                </div>
               </div>
             </div>
           </div>
@@ -178,9 +198,9 @@ function ToolIconBtn({ onClick, active, title, children }: { onClick?: () => voi
       title={title}
       className="tool-icon-btn"
       style={{
-        width: 38,
-        height: 38,
-        borderRadius: 11,
+        width: 30,
+        height: 30,
+        borderRadius: 9,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -201,13 +221,13 @@ function Pill({ solid, children }: { solid?: boolean; children: ReactNode }) {
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 6,
-        height: 34,
-        padding: '0 14px',
-        borderRadius: 12,
+        gap: 5,
+        height: 28,
+        padding: '0 11px',
+        borderRadius: 10,
         cursor: 'pointer',
         whiteSpace: 'nowrap',
-        font: '600 12px Assistant,sans-serif',
+        font: '600 10.5px Assistant,sans-serif',
         background: solid ? '#1863e0' : 'rgba(255,255,255,.06)',
         color: solid ? '#ffffff' : '#c8d0dd',
         border: solid ? '1px solid #1863e0' : '1px solid rgba(255,255,255,.09)',
@@ -218,20 +238,20 @@ function Pill({ solid, children }: { solid?: boolean; children: ReactNode }) {
   );
 }
 
-function StatTile({ def, on, onClick, icon }: { def: (typeof LAYERS)[number]; on: boolean; onClick: () => void; icon?: ReactNode }) {
+function StatTile({ def, on, onClick }: { def: (typeof LAYERS)[number]; on: boolean; onClick: () => void }) {
   return (
     <div
       onClick={onClick}
       style={{
-        flex: '1 1 0',
+        flex: '0 0 78px',
         minWidth: 0,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 6,
-        padding: '14px 8px',
-        borderRadius: 16,
+        gap: 3,
+        padding: '8px 4px',
+        borderRadius: 12,
         cursor: 'pointer',
         textAlign: 'center',
         background: on ? hexA(def.color, 0.14) : 'rgba(255,255,255,.04)',
@@ -239,8 +259,7 @@ function StatTile({ def, on, onClick, icon }: { def: (typeof LAYERS)[number]; on
         transition: 'background 140ms cubic-bezier(.2,0,0,1)',
       }}
     >
-      {icon}
-      <span style={{ font: '500 12px/1.3 Assistant,sans-serif', color: '#c9cedb' }}>
+      <span style={{ font: '500 10px/1.25 Assistant,sans-serif', color: '#c9cedb' }}>
         {def.label1}
         {def.label2 && (
           <>
@@ -249,64 +268,63 @@ function StatTile({ def, on, onClick, icon }: { def: (typeof LAYERS)[number]; on
           </>
         )}
       </span>
-      <span style={{ font: '700 22px Assistant,sans-serif', color: def.color }}>{def.value || '—'}</span>
+      <span style={{ font: '700 17px Assistant,sans-serif', color: def.color }}>{def.value || '—'}</span>
     </div>
   );
 }
 
-function HeatTile({ on, onClick }: { on: boolean; onClick: () => void }) {
-  return (
-    <div
-      onClick={onClick}
-      style={{
-        flex: '0 0 170px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 10,
-        borderRadius: 18,
-        cursor: 'pointer',
-        background: on ? 'rgba(91,155,255,.14)' : 'rgba(255,255,255,.04)',
-        border: `1px solid ${on ? '#5b9bff' : 'rgba(255,255,255,.08)'}`,
-      }}
-    >
-      <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(255,255,255,.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <MapIcon />
-      </div>
-      <span style={{ font: '600 13px/1.4 Assistant,sans-serif', color: '#e7edf7', textAlign: 'center' }}>
-        מפת חום
-        <br />
-        כוחותינו
-      </span>
-    </div>
-  );
-}
+const ADV_META: Record<string, { label1: string; label2?: string; color: string; icon: (color: string) => ReactNode }> = {
+  aman: { label1: 'חקורים', label2: 'אמ״ן', color: '#a78bfa', icon: (c) => <AmanGlyph color={c} /> },
+  doc: { label1: 'תיעוד', label2: 'מבצעי', color: '#9ec3ff', icon: (c) => <CameraIcon color={c} /> },
+  heat: { label1: 'מפת חום', label2: 'כוחותינו', color: '#5b9bff', icon: (c) => <MapIcon color={c} /> },
+  history: { label1: 'היסטוריית', label2: 'מבנים', color: '#e7edf7', icon: (c) => <FolderIcon color={c} /> },
+  shield: { label1: 'ציון', label2: 'מגן', color: '#ff4d4f', icon: (c) => <ShieldIcon color={c} /> },
+};
 
-function DocTile({ on, onClick }: { on: boolean; onClick: () => void }) {
+function AdvTile({
+  tileKey,
+  layers,
+  docOpen,
+  toggleDoc,
+  toggleLayer,
+}: {
+  tileKey: string;
+  layers: Record<string, boolean>;
+  docOpen: boolean;
+  toggleDoc: () => void;
+  toggleLayer: (key: string) => void;
+}) {
+  const meta = ADV_META[tileKey];
+  if (!meta) return null;
+  const on = tileKey === 'doc' ? docOpen : !!layers[tileKey];
+  const onClick = tileKey === 'doc' ? toggleDoc : () => toggleLayer(tileKey);
   return (
     <div
       onClick={onClick}
       style={{
-        flex: '0 0 150px',
+        flex: '0 0 78px',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 10,
-        borderRadius: 18,
+        gap: 5,
+        padding: '10px 4px',
+        borderRadius: 12,
         cursor: 'pointer',
-        background: on ? 'rgba(158,195,255,.14)' : 'rgba(255,255,255,.04)',
-        border: `1px solid ${on ? '#9ec3ff' : 'rgba(255,255,255,.08)'}`,
+        textAlign: 'center',
+        background: on ? hexA(meta.color, 0.14) : 'rgba(255,255,255,.04)',
+        border: `1px solid ${on ? meta.color : 'rgba(255,255,255,.08)'}`,
       }}
     >
-      <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(255,255,255,.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <CameraIcon />
-      </div>
-      <span style={{ font: '600 13px/1.4 Assistant,sans-serif', color: '#e7edf7', textAlign: 'center' }}>
-        תיעוד
-        <br />
-        מבצעי
+      <div style={{ width: 26, height: 26, borderRadius: 8, background: 'rgba(255,255,255,.07)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{meta.icon(meta.color)}</div>
+      <span style={{ font: '500 10px/1.25 Assistant,sans-serif', color: '#c9cedb' }}>
+        {meta.label1}
+        {meta.label2 && (
+          <>
+            <br />
+            {meta.label2}
+          </>
+        )}
       </span>
     </div>
   );
@@ -355,36 +373,51 @@ function FilterIcon() {
   );
 }
 
-function MapIcon() {
+function MapIcon({ color = '#e7edf7' }: { color?: string }) {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e7edf7" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
       <path d="M9 3 3 5v16l6-2 6 2 6-2V3l-6 2-6-2Z" />
       <path d="M9 3v16M15 5v16" />
     </svg>
   );
 }
 
-function CameraIcon() {
+function CameraIcon({ color = '#e7edf7' }: { color?: string }) {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e7edf7" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
       <path d="M4 8h3l1.6-2.4A2 2 0 0 1 10.3 4.5h3.4a2 2 0 0 1 1.7 1.1L17 8h3a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 20 20H4a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 4 8Z" />
       <circle cx="12" cy="13.5" r="3.5" />
     </svg>
   );
 }
 
-function AmanIcon({ color }: { color: string }) {
+function FolderIcon({ color = '#e7edf7' }: { color?: string }) {
   return (
-    <div style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(255,255,255,.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2c1 2 1.6 3.4 1.6 4.8A2.6 2.6 0 0 1 12 9a2.6 2.6 0 0 1-1.6-4.2C11 3.4 11.6 2 12 2Z" />
-        <path d="M12 9v3" />
-        <path d="M12 6.4C9.8 7.6 8.4 8.6 7.6 9.8A2.6 2.6 0 0 0 9 13.4a2.6 2.6 0 0 0 2.6-3.1c-.2-1.4-.7-2.4 0.4-3.9Z" />
-        <path d="M12 6.4c2.2 1.2 3.6 2.2 4.4 3.4A2.6 2.6 0 0 1 15 13.4a2.6 2.6 0 0 1-2.6-3.1c.2-1.4.7-2.4-.4-3.9Z" />
-        <path d="M12 12v3" />
-        <path d="M8 21v-2.5A4 4 0 0 1 12 14.5v0A4 4 0 0 1 16 18.5V21" />
-        <path d="M6 21h12" />
-      </svg>
-    </div>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
+    </svg>
+  );
+}
+
+function ShieldIcon({ color = '#e7edf7' }: { color?: string }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3 4.5 6v6c0 4.4 3 7.5 7.5 9 4.5-1.5 7.5-4.6 7.5-9V6L12 3Z" />
+      <path d="m9 12 2 2 4-4" />
+    </svg>
+  );
+}
+
+function AmanGlyph({ color }: { color: string }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2c1 2 1.6 3.4 1.6 4.8A2.6 2.6 0 0 1 12 9a2.6 2.6 0 0 1-1.6-4.2C11 3.4 11.6 2 12 2Z" />
+      <path d="M12 9v3" />
+      <path d="M12 6.4C9.8 7.6 8.4 8.6 7.6 9.8A2.6 2.6 0 0 0 9 13.4a2.6 2.6 0 0 0 2.6-3.1c-.2-1.4-.7-2.4 0.4-3.9Z" />
+      <path d="M12 6.4c2.2 1.2 3.6 2.2 4.4 3.4A2.6 2.6 0 0 1 15 13.4a2.6 2.6 0 0 1-2.6-3.1c.2-1.4.7-2.4-.4-3.9Z" />
+      <path d="M12 12v3" />
+      <path d="M8 21v-2.5A4 4 0 0 1 12 14.5v0A4 4 0 0 1 16 18.5V21" />
+      <path d="M6 21h12" />
+    </svg>
   );
 }
