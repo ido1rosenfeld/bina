@@ -3,6 +3,7 @@ import TopBar from './components/TopBar';
 import MapView, { type MapViewHandle } from './components/MapView';
 import FilterBar from './components/FilterBar';
 import AiPanel from './components/AiPanel';
+import AiFab from './components/AiFab';
 import EventListOverlay from './components/EventListOverlay';
 import EventCardModal from './components/EventCardModal';
 import { EVENTS, INITIAL_MESSAGES, answerFor } from './data';
@@ -18,8 +19,9 @@ export default function App() {
 
   const [docOpen, setDocOpen] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
+  const [sectionAOpen, setSectionAOpen] = useState(true);
+  const [sectionBOpen, setSectionBOpen] = useState(true);
   const [graphsOn, setGraphsOn] = useState(false);
-  const [chatOpen, setChatOpen] = useState(true);
   const [highlight] = useState<string | null>(null);
   const [layers, setLayers] = useState<Record<string, boolean>>({ events: true, detect: true });
   const [panelW, setPanelW] = useState(420);
@@ -86,7 +88,6 @@ export default function App() {
     const now = new Date();
     const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     setDraft('');
-    setChatOpen(true);
     setMessages((s) => [...s, { who: 'me', text: q, time }, { who: 'ai', ...reply, time }]);
   }
 
@@ -102,13 +103,18 @@ export default function App() {
     <div dir="rtl" style={{ position: 'fixed', inset: 0, background: '#14151a', color: '#e7edf7', overflow: 'hidden', fontFamily: 'Assistant,system-ui,sans-serif' }}>
       <MapView ref={mapRef} layers={layers} mapRight={mapRight} />
       <TopBar />
-      <FilterBar mapRight={mapRight} docOpen={docOpen} toggleDoc={() => setDocOpen((v) => !v)} layers={layers} toggleLayer={toggleLayer} onOpenAi={() => setAiOpen(true)} aiOpen={aiOpen} />
+      <FilterBar mapRight={mapRight} docOpen={docOpen} toggleDoc={() => setDocOpen((v) => !v)} layers={layers} toggleLayer={toggleLayer} />
+      {!aiOpen && <AiFab onClick={() => setAiOpen(true)} />}
 
       {aiOpen && (
         <AiPanel
           panelW={panelW}
           onResizeStart={beginResize}
           onClose={closeAi}
+          sectionAOpen={sectionAOpen}
+          toggleSectionA={() => setSectionAOpen((v) => !v)}
+          sectionBOpen={sectionBOpen}
+          toggleSectionB={() => setSectionBOpen((v) => !v)}
           graphsOn={graphsOn}
           toggleGraphs={() => setGraphsOn((v) => !v)}
           highlight={highlight}
@@ -127,8 +133,6 @@ export default function App() {
           onCloseReport={() => setReportClaim(null)}
           onPickCat={(id) => setReportCat(id)}
           onSubmitReport={submitReport}
-          chatOpen={chatOpen}
-          toggleChat={() => setChatOpen((v) => !v)}
           messages={messages}
           suggestedOpen={suggestedOpen}
           toggleSuggested={() => setSuggestedOpen((v) => !v)}

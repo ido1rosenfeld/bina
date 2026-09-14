@@ -7,14 +7,12 @@ interface FilterBarProps {
   toggleDoc: () => void;
   layers: Record<string, boolean>;
   toggleLayer: (key: string) => void;
-  onOpenAi: () => void;
-  aiOpen: boolean;
 }
 
 const ROW1_KEYS = ['sabotage', 'detect', 'targets', 'reports'];
-const ROW2_KEYS = ['history', 'capture', 'infra', 'tahak', 'events'];
+const ROW2_KEYS = ['history', 'capture', 'infra', 'tahak', 'events', 'aman'];
 
-export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggleLayer, onOpenAi, aiOpen }: FilterBarProps) {
+export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggleLayer }: FilterBarProps) {
   return (
     <div
       style={{
@@ -112,7 +110,7 @@ export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggle
           style={{
             pointerEvents: 'auto',
             width: 'max-content',
-            maxWidth: 'min(100%,760px)',
+            maxWidth: 'min(96%,940px)',
             padding: '14px 16px',
             background: 'rgba(20,22,28,.72)',
             backdropFilter: 'blur(14px)',
@@ -134,9 +132,6 @@ export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggle
               </Pill>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <ToolIconBtn onClick={onOpenAi} active={aiOpen} title="סוכן גזרה מבצעית">
-                <ChatIcon />
-              </ToolIconBtn>
               <ToolIconBtn onClick={toggleDoc} active={docOpen} title="תיעוד מבצעי">
                 <PencilIcon />
               </ToolIconBtn>
@@ -150,6 +145,7 @@ export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggle
           </div>
 
           <div style={{ direction: 'ltr', display: 'flex', alignItems: 'stretch', gap: 10 }}>
+            <DocTile on={docOpen} onClick={toggleDoc} />
             <HeatTile on={!!layers.heat} onClick={() => toggleLayer('heat')} />
             <div style={{ width: 1, alignSelf: 'stretch', background: 'rgba(255,255,255,.1)' }} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: '1 1 auto' }}>
@@ -164,7 +160,7 @@ export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggle
                 {ROW2_KEYS.map((key) => {
                   const def = LAYERS.find((l) => l.key === key);
                   if (!def) return null;
-                  return <StatTile key={key} def={def} on={!!layers[key]} onClick={() => toggleLayer(key)} />;
+                  return <StatTile key={key} def={def} on={!!layers[key]} onClick={() => toggleLayer(key)} icon={key === 'aman' ? <AmanIcon color={def.color} /> : undefined} />;
                 })}
               </div>
             </div>
@@ -222,7 +218,7 @@ function Pill({ solid, children }: { solid?: boolean; children: ReactNode }) {
   );
 }
 
-function StatTile({ def, on, onClick }: { def: (typeof LAYERS)[number]; on: boolean; onClick: () => void }) {
+function StatTile({ def, on, onClick, icon }: { def: (typeof LAYERS)[number]; on: boolean; onClick: () => void; icon?: ReactNode }) {
   return (
     <div
       onClick={onClick}
@@ -243,6 +239,7 @@ function StatTile({ def, on, onClick }: { def: (typeof LAYERS)[number]; on: bool
         transition: 'background 140ms cubic-bezier(.2,0,0,1)',
       }}
     >
+      {icon}
       <span style={{ font: '500 12px/1.3 Assistant,sans-serif', color: '#c9cedb' }}>
         {def.label1}
         {def.label2 && (
@@ -286,11 +283,32 @@ function HeatTile({ on, onClick }: { on: boolean; onClick: () => void }) {
   );
 }
 
-function ChatIcon() {
+function DocTile({ on, onClick }: { on: boolean; onClick: () => void }) {
   return (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#e7edf7" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 4h16v12H8l-4 4V4Z" />
-    </svg>
+    <div
+      onClick={onClick}
+      style={{
+        flex: '0 0 150px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 10,
+        borderRadius: 18,
+        cursor: 'pointer',
+        background: on ? 'rgba(158,195,255,.14)' : 'rgba(255,255,255,.04)',
+        border: `1px solid ${on ? '#9ec3ff' : 'rgba(255,255,255,.08)'}`,
+      }}
+    >
+      <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(255,255,255,.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <CameraIcon />
+      </div>
+      <span style={{ font: '600 13px/1.4 Assistant,sans-serif', color: '#e7edf7', textAlign: 'center' }}>
+        תיעוד
+        <br />
+        מבצעי
+      </span>
+    </div>
   );
 }
 
@@ -343,5 +361,30 @@ function MapIcon() {
       <path d="M9 3 3 5v16l6-2 6 2 6-2V3l-6 2-6-2Z" />
       <path d="M9 3v16M15 5v16" />
     </svg>
+  );
+}
+
+function CameraIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e7edf7" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 8h3l1.6-2.4A2 2 0 0 1 10.3 4.5h3.4a2 2 0 0 1 1.7 1.1L17 8h3a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 20 20H4a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 4 8Z" />
+      <circle cx="12" cy="13.5" r="3.5" />
+    </svg>
+  );
+}
+
+function AmanIcon({ color }: { color: string }) {
+  return (
+    <div style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(255,255,255,.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2c1 2 1.6 3.4 1.6 4.8A2.6 2.6 0 0 1 12 9a2.6 2.6 0 0 1-1.6-4.2C11 3.4 11.6 2 12 2Z" />
+        <path d="M12 9v3" />
+        <path d="M12 6.4C9.8 7.6 8.4 8.6 7.6 9.8A2.6 2.6 0 0 0 9 13.4a2.6 2.6 0 0 0 2.6-3.1c-.2-1.4-.7-2.4 0.4-3.9Z" />
+        <path d="M12 6.4c2.2 1.2 3.6 2.2 4.4 3.4A2.6 2.6 0 0 1 15 13.4a2.6 2.6 0 0 1-2.6-3.1c.2-1.4.7-2.4-.4-3.9Z" />
+        <path d="M12 12v3" />
+        <path d="M8 21v-2.5A4 4 0 0 1 12 14.5v0A4 4 0 0 1 16 18.5V21" />
+        <path d="M6 21h12" />
+      </svg>
+    </div>
   );
 }

@@ -17,6 +17,20 @@ export const EVENTS: EventItem[] = [
   { id: 'e6', sev: 2, text: 'איתור פתח מנהרה חדש בשולי הרכס', time: '12/05 08:15', place: 'רכס מרכזי', coord: '31.5209, 34.4471', source: 'צוות איתור' },
 ];
 
+export interface SeveritySlice {
+  label: string;
+  sev: number;
+  count: number;
+  color: string;
+}
+
+export const SEVERITY_BREAKDOWN: SeveritySlice[] = [
+  { label: 'קריטי', sev: 4, count: 9, color: '#ff4d4f' },
+  { label: 'גבוה', sev: 3, count: 15, color: '#f5a524' },
+  { label: 'בינוני', sev: 2, count: 22, color: '#5b9bff' },
+  { label: 'נמוך', sev: 1, count: 18, color: '#8f97a6' },
+];
+
 export interface LayerDef {
   key: string;
   label1: string;
