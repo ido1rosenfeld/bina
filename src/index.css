@@ -99,6 +99,10 @@ input, textarea {
   color: #c8d0dd;
 }
 
+.tool-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
 .opsmap-tag {
   font: 600 9px/1 'Assistant', sans-serif;
   color: #e7edf7;

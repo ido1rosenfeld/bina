@@ -1,4 +1,5 @@
-import { GROUPS, LAYERS, SHOTS, hexA } from '../data';
+import type { ReactNode } from 'react';
+import { LAYERS, SHOTS, hexA } from '../data';
 
 interface FilterBarProps {
   mapRight: string;
@@ -7,9 +8,13 @@ interface FilterBarProps {
   layers: Record<string, boolean>;
   toggleLayer: (key: string) => void;
   onOpenAi: () => void;
+  aiOpen: boolean;
 }
 
-export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggleLayer, onOpenAi }: FilterBarProps) {
+const ROW1_KEYS = ['sabotage', 'detect', 'targets', 'reports'];
+const ROW2_KEYS = ['history', 'capture', 'infra', 'tahak', 'events'];
+
+export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggleLayer, onOpenAi, aiOpen }: FilterBarProps) {
   return (
     <div
       style={{
@@ -103,48 +108,66 @@ export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggle
           </div>
         )}
 
-        <div style={{ pointerEvents: 'auto', width: 'max-content', maxWidth: 'min(100%,470px)', padding: '7px 10px 9px', background: '#1a1c21', border: '1px solid rgba(255,255,255,.13)', borderRadius: 12, boxShadow: '0 16px 64px rgba(1,6,45,.45)' }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px 14px', marginBottom: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5, height: 19, padding: '0 6px', background: 'rgba(14,51,114,.35)', border: '1px solid #154ba7', borderRadius: 5, font: '500 10px Assistant,sans-serif', color: '#9ec3ff', cursor: 'pointer' }}>
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
-                  <path d="M3 4h18l-7 8v6l-4 2v-8z" />
-                </svg>
-                סינונים רוחביים
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5, height: 19, padding: '0 6px', background: '#081c3d', border: '1px solid rgba(255,255,255,.13)', borderRadius: 5, font: '500 10px Assistant,sans-serif', color: '#c8d0dd', cursor: 'pointer' }}>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#9aa3b2" strokeWidth={2}>
-                  <rect x="3" y="3" width="8" height="8" rx="1" />
-                  <rect x="13" y="3" width="8" height="8" rx="1" />
-                  <rect x="3" y="13" width="8" height="8" rx="1" />
-                  <rect x="13" y="13" width="8" height="8" rx="1" />
-                </svg>
+        <div
+          style={{
+            pointerEvents: 'auto',
+            width: 'max-content',
+            maxWidth: 'min(100%,760px)',
+            padding: '14px 16px',
+            background: 'rgba(20,22,28,.72)',
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
+            border: '1px solid rgba(255,255,255,.1)',
+            borderRadius: 20,
+            boxShadow: '0 20px 70px rgba(0,0,0,.5)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 14 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Pill>
+                <TableIcon />
                 טבלת ישויות
-              </div>
-              <div onClick={onOpenAi} style={{ display: 'flex', alignItems: 'center', gap: 5, height: 19, padding: '0 6px', background: '#081c3d', border: '1px solid rgba(255,255,255,.13)', borderRadius: 5, font: '500 10px Assistant,sans-serif', color: '#c8d0dd', cursor: 'pointer' }}>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#30a46c" strokeWidth={2} strokeLinecap="round">
-                  <path d="M3 17V7l6 3 6-3 6 3v10l-6-3-6 3z" />
-                </svg>
-                תובנות וגרפים
-              </div>
+              </Pill>
+              <Pill solid>
+                <FilterIcon />
+                סינונים רוחביים
+              </Pill>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: '#9aa3b2' }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" style={{ cursor: 'pointer' }}>
-                <path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5" />
-              </svg>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" style={{ cursor: 'pointer' }}>
-                <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" />
-              </svg>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" style={{ cursor: 'pointer' }}>
-                <path d="M18 6 6 18M6 6l12 12" />
-              </svg>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <ToolIconBtn onClick={onOpenAi} active={aiOpen} title="סוכן גזרה מבצעית">
+                <ChatIcon />
+              </ToolIconBtn>
+              <ToolIconBtn onClick={toggleDoc} active={docOpen} title="תיעוד מבצעי">
+                <PencilIcon />
+              </ToolIconBtn>
+              <ToolIconBtn title="רענון">
+                <RefreshIcon />
+              </ToolIconBtn>
+              <ToolIconBtn title="סגור">
+                <XIcon />
+              </ToolIconBtn>
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '5px 6px' }}>
-            {GROUPS.map((group) => (
-              <FragmentGroup key={group.name} name={group.name} color={group.color} keys={group.keys} layers={layers} toggleLayer={toggleLayer} />
-            ))}
+          <div style={{ direction: 'ltr', display: 'flex', alignItems: 'stretch', gap: 10 }}>
+            <HeatTile on={!!layers.heat} onClick={() => toggleLayer('heat')} />
+            <div style={{ width: 1, alignSelf: 'stretch', background: 'rgba(255,255,255,.1)' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: '1 1 auto' }}>
+              <div style={{ display: 'flex', gap: 10 }}>
+                {ROW1_KEYS.map((key) => {
+                  const def = LAYERS.find((l) => l.key === key);
+                  if (!def) return null;
+                  return <StatTile key={key} def={def} on={!!layers[key]} onClick={() => toggleLayer(key)} />;
+                })}
+              </div>
+              <div style={{ display: 'flex', gap: 10 }}>
+                {ROW2_KEYS.map((key) => {
+                  const def = LAYERS.find((l) => l.key === key);
+                  if (!def) return null;
+                  return <StatTile key={key} def={def} on={!!layers[key]} onClick={() => toggleLayer(key)} />;
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -152,44 +175,173 @@ export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggle
   );
 }
 
-function FragmentGroup({ name, color, keys, layers, toggleLayer }: { name: string; color: string; keys: string[]; layers: Record<string, boolean>; toggleLayer: (key: string) => void }) {
+function ToolIconBtn({ onClick, active, title, children }: { onClick?: () => void; active?: boolean; title: string; children: ReactNode }) {
   return (
-    <>
-      <span style={{ font: '700 9px/1 Assistant,sans-serif', color, letterSpacing: '.02em', whiteSpace: 'nowrap' }}>{name}</span>
-      {keys.map((key) => {
-        const def = LAYERS.find((l) => l.key === key);
-        if (!def) return null;
-        const on = !!layers[key];
-        const bg = on ? hexA(def.color, 0.16) : '#2b2e34';
-        const border = on ? def.color : 'rgba(255,255,255,.09)';
-        const labelColor = on ? '#ffffff' : '#c8d0dd';
-        return (
-          <div
-            key={key}
-            onClick={() => toggleLayer(key)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 5,
-              height: 24,
-              padding: '0 8px',
-              background: bg,
-              border: `1px solid ${border}`,
-              borderRadius: 6,
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              transition: 'background 140ms cubic-bezier(.2,0,0,1)',
-            }}
-          >
-            <span style={{ flex: '0 0 6px', width: 6, height: 6, borderRadius: '50%', background: def.color }} />
-            <span style={{ font: '500 10px/1 Assistant,sans-serif', color: labelColor }}>
-              {def.label1}
-              {def.label2 ? ` ${def.label2}` : ''}
-            </span>
-            {def.value && <span style={{ font: '700 10px/1 Assistant,sans-serif', color: def.color }}>{def.value}</span>}
-          </div>
-        );
-      })}
-    </>
+    <div
+      onClick={onClick}
+      title={title}
+      className="tool-icon-btn"
+      style={{
+        width: 38,
+        height: 38,
+        borderRadius: 11,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        background: active ? 'rgba(24,110,255,.22)' : 'rgba(255,255,255,.06)',
+        border: `1px solid ${active ? '#2f6fd6' : 'rgba(255,255,255,.09)'}`,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function Pill({ solid, children }: { solid?: boolean; children: ReactNode }) {
+  return (
+    <div
+      className={solid ? 'pill-btn' : 'pill-btn'}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        height: 34,
+        padding: '0 14px',
+        borderRadius: 12,
+        cursor: 'pointer',
+        whiteSpace: 'nowrap',
+        font: '600 12px Assistant,sans-serif',
+        background: solid ? '#1863e0' : 'rgba(255,255,255,.06)',
+        color: solid ? '#ffffff' : '#c8d0dd',
+        border: solid ? '1px solid #1863e0' : '1px solid rgba(255,255,255,.09)',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function StatTile({ def, on, onClick }: { def: (typeof LAYERS)[number]; on: boolean; onClick: () => void }) {
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        flex: '1 1 0',
+        minWidth: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 6,
+        padding: '14px 8px',
+        borderRadius: 16,
+        cursor: 'pointer',
+        textAlign: 'center',
+        background: on ? hexA(def.color, 0.14) : 'rgba(255,255,255,.04)',
+        border: `1px solid ${on ? def.color : 'rgba(255,255,255,.08)'}`,
+        transition: 'background 140ms cubic-bezier(.2,0,0,1)',
+      }}
+    >
+      <span style={{ font: '500 12px/1.3 Assistant,sans-serif', color: '#c9cedb' }}>
+        {def.label1}
+        {def.label2 && (
+          <>
+            <br />
+            {def.label2}
+          </>
+        )}
+      </span>
+      <span style={{ font: '700 22px Assistant,sans-serif', color: def.color }}>{def.value || '—'}</span>
+    </div>
+  );
+}
+
+function HeatTile({ on, onClick }: { on: boolean; onClick: () => void }) {
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        flex: '0 0 170px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 10,
+        borderRadius: 18,
+        cursor: 'pointer',
+        background: on ? 'rgba(91,155,255,.14)' : 'rgba(255,255,255,.04)',
+        border: `1px solid ${on ? '#5b9bff' : 'rgba(255,255,255,.08)'}`,
+      }}
+    >
+      <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(255,255,255,.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <MapIcon />
+      </div>
+      <span style={{ font: '600 13px/1.4 Assistant,sans-serif', color: '#e7edf7', textAlign: 'center' }}>
+        מפת חום
+        <br />
+        כוחותינו
+      </span>
+    </div>
+  );
+}
+
+function ChatIcon() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#e7edf7" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 4h16v12H8l-4 4V4Z" />
+    </svg>
+  );
+}
+
+function PencilIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e7edf7" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" />
+    </svg>
+  );
+}
+
+function RefreshIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e7edf7" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5" />
+    </svg>
+  );
+}
+
+function XIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e7edf7" strokeWidth={1.9} strokeLinecap="round">
+      <path d="M18 6 6 18M6 6l12 12" />
+    </svg>
+  );
+}
+
+function TableIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+      <rect x="3" y="3" width="8" height="8" rx="1" />
+      <rect x="13" y="3" width="8" height="8" rx="1" />
+      <rect x="3" y="13" width="8" height="8" rx="1" />
+      <rect x="13" y="13" width="8" height="8" rx="1" />
+    </svg>
+  );
+}
+
+function FilterIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+      <path d="M3 4h18l-7 8v6l-4 2v-8z" />
+    </svg>
+  );
+}
+
+function MapIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e7edf7" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 3 3 5v16l6-2 6 2 6-2V3l-6 2-6-2Z" />
+      <path d="M9 3v16M15 5v16" />
+    </svg>
   );
 }

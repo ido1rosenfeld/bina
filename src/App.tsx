@@ -102,7 +102,7 @@ export default function App() {
     <div dir="rtl" style={{ position: 'fixed', inset: 0, background: '#14151a', color: '#e7edf7', overflow: 'hidden', fontFamily: 'Assistant,system-ui,sans-serif' }}>
       <MapView ref={mapRef} layers={layers} mapRight={mapRight} />
       <TopBar />
-      <FilterBar mapRight={mapRight} docOpen={docOpen} toggleDoc={() => setDocOpen((v) => !v)} layers={layers} toggleLayer={toggleLayer} onOpenAi={() => setAiOpen(true)} />
+      <FilterBar mapRight={mapRight} docOpen={docOpen} toggleDoc={() => setDocOpen((v) => !v)} layers={layers} toggleLayer={toggleLayer} onOpenAi={() => setAiOpen(true)} aiOpen={aiOpen} />
 
       {aiOpen && (
         <AiPanel
