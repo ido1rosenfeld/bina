@@ -20,6 +20,46 @@ input, textarea {
   font-family: inherit;
 }
 
+.print-only {
+  display: none;
+}
+
+@media print {
+  html, body, #root {
+    overflow: visible !important;
+    height: auto !important;
+    background: #fff !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  #print-report, #print-report * {
+    visibility: visible !important;
+  }
+
+  #print-report {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: #14151a !important;
+    padding: 24px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #print-report .no-print {
+    display: none !important;
+  }
+
+  #print-report .print-only {
+    display: block !important;
+  }
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;

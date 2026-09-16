@@ -370,6 +370,13 @@ export default function AiPanel(props: AiPanelProps) {
 
   const topEvents = EVENTS.filter((e) => e.sev >= 3);
 
+  function handleExport() {
+    if (!sectionAOpen) toggleSectionA();
+    if (!sectionBOpen) toggleSectionB();
+    if (!graphsOn) toggleGraphs();
+    setTimeout(() => window.print(), 300);
+  }
+
   function jumpTo(id: string, open: boolean, onToggle: () => void) {
     if (!open) onToggle();
     requestAnimationFrame(() => {
@@ -405,7 +412,7 @@ export default function AiPanel(props: AiPanelProps) {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ font: '700 15px Assistant,sans-serif', color: '#E6F5FF' }}>תובנות</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span title="ייצוא" style={{ font: '400 14px Assistant,sans-serif', color: '#8F91A0', cursor: 'pointer' }}>
+            <span onClick={handleExport} title="ייצוא ל-PDF" style={{ font: '400 14px Assistant,sans-serif', color: '#8F91A0', cursor: 'pointer' }}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8F91A0" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 3v12m0 0-4-4m4 4 4-4" />
                 <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
@@ -440,6 +447,12 @@ export default function AiPanel(props: AiPanelProps) {
       <div style={{ flex: '1 1 auto', minWidth: 0, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <div id="ai-scroll" style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
           <span style={{ font: '400 10px Assistant,sans-serif', color: '#8F91A0', direction: 'ltr', alignSelf: 'flex-end' }}>מבוסס בינה מלאכותית, יש להפעיל שיקול דעת בשימוש</span>
+
+          <div id="print-report" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div className="print-only" style={{ marginBottom: 4 }}>
+            <div style={{ font: '700 16px Assistant,sans-serif', color: '#E6F5FF' }}>דוח תמונת מצב — חרבות ברזל · חטיבה 188</div>
+            <div style={{ font: '400 11px Assistant,sans-serif', color: '#8F91A0' }}>הופק בתאריך {new Date().toLocaleString('he-IL')}</div>
+          </div>
 
           <div>
             <SectionHeader id="section-a" color="#30a46c" icon={<ClipboardIcon />} title="חלק א׳ - קרקע ומאפייני סביבה" open={sectionAOpen} onToggle={toggleSectionA} />
@@ -483,14 +496,14 @@ export default function AiPanel(props: AiPanelProps) {
                   ))}
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: 12 }}>
+                <div className="no-print" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: 12 }}>
                   <span onClick={onReportSummary} className="report-link" style={{ font: '500 10px Assistant,sans-serif', color: '#8F91A0', cursor: 'pointer' }}>
                     דווח על אי־דיוק
                   </span>
                 </div>
 
                 {reportClaim && (
-                  <div style={{ marginTop: 10, border: '1px solid #7a3b3f', borderRadius: 10, background: 'rgba(229,72,77,.06)', padding: '12px 14px' }}>
+                  <div className="no-print" style={{ marginTop: 10, border: '1px solid #7a3b3f', borderRadius: 10, background: 'rgba(229,72,77,.06)', padding: '12px 14px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                       <span style={{ font: '700 12px Assistant,sans-serif', color: '#ff8f92' }}>דיווח על טענה</span>
                       <span onClick={onCloseReport} style={{ font: '400 13px Assistant,sans-serif', color: '#8F91A0', cursor: 'pointer' }}>
@@ -537,7 +550,7 @@ export default function AiPanel(props: AiPanelProps) {
                 )}
 
                 {reportDone && (
-                  <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 8, padding: '9px 12px', border: '1px solid #2f6d4f', borderRadius: 8, background: 'rgba(48,164,108,.08)', font: '500 11px Assistant,sans-serif', color: '#7fdcab' }}>
+                  <div className="no-print" style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 8, padding: '9px 12px', border: '1px solid #2f6d4f', borderRadius: 8, background: 'rgba(48,164,108,.08)', font: '500 11px Assistant,sans-serif', color: '#7fdcab' }}>
                     הדיווח נשלח לתור ניהול המוצר. הסיכום לא השתנה.
                   </div>
                 )}
@@ -593,6 +606,7 @@ export default function AiPanel(props: AiPanelProps) {
                 </div>
               </div>
             )}
+          </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 12px', border: '1px solid rgba(255,255,255,.13)', borderRadius: 9, background: '#22252b' }}>
