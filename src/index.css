@@ -86,6 +86,11 @@ input, textarea {
   background: #2b2e34 !important;
 }
 
+.starter-q:hover {
+  background: #2b2e34 !important;
+  border-color: rgba(91, 155, 255, 0.4) !important;
+}
+
 .graphs-toggle:hover {
   background: rgba(24, 110, 255, 0.18) !important;
 }

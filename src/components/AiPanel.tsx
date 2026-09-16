@@ -232,6 +232,71 @@ function NavPill({ color, children, onClick }: { color: string; children: ReactN
   );
 }
 
+function SparkleIcon({ size = 22 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="#fff">
+      <path d="M12 2c.9 3.4 1.9 4.9 4.6 5.6-2.7.7-3.7 2.2-4.6 5.6-.9-3.4-1.9-4.9-4.6-5.6C10.1 6.9 11.1 5.4 12 2Z" />
+      <path d="M19 13c.5 1.8 1 2.5 2.4 2.9-1.4.4-1.9 1.1-2.4 2.9-.5-1.8-1-2.5-2.4-2.9 1.4-.4 1.9-1.1 2.4-2.9Z" />
+      <path d="M6 15c.4 1.4.8 1.9 1.9 2.2-1.1.3-1.5.8-1.9 2.2-.4-1.4-.8-1.9-1.9-2.2 1.1-.3 1.5-.8 1.9-2.2Z" />
+    </svg>
+  );
+}
+
+function EmptyChatState({ onAsk }: { onAsk: (q: string) => void }) {
+  return (
+    <div style={{ flex: '1 1 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, padding: '18px 6px', textAlign: 'center' }}>
+      <div
+        style={{
+          width: 44,
+          height: 44,
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg,#4f7bff,#8a5cf6,#e05ad0)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 8px 28px rgba(90,60,220,.35)',
+        }}
+      >
+        <SparkleIcon />
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <span style={{ font: '700 14px Assistant,sans-serif', color: '#E6F5FF' }}>מה תרצו לדעת על הגזרה?</span>
+        <span style={{ font: '400 11px/1.5 Assistant,sans-serif', color: '#8F91A0' }}>אפשר לשאול בשפה חופשית על אירועים, מגמות ותשתיות בפוליגון שנבחר</span>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 7, width: '100%', maxWidth: 300 }}>
+        {SUGGESTED_QUESTIONS.map((q) => (
+          <div
+            key={q}
+            onClick={() => onAsk(q)}
+            className="starter-q"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 8,
+              padding: '9px 12px',
+              border: '1px solid rgba(255,255,255,.13)',
+              borderRadius: 10,
+              background: '#22252b',
+              font: '400 12px Assistant,sans-serif',
+              color: '#c8d0dd',
+              cursor: 'pointer',
+              textAlign: 'right',
+            }}
+          >
+            <span>{q}</span>
+            <span style={{ flex: '0 0 auto', color: '#8F91A0' }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="m9 6 6 6-6 6" />
+              </svg>
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function DonutChart({ size = 108 }: { size?: number }) {
   const total = SEVERITY_BREAKDOWN.reduce((s, x) => s + x.count, 0);
   const r = 40;
@@ -560,6 +625,8 @@ export default function AiPanel(props: AiPanelProps) {
             </div>
           </div>
 
+          {messages.length === 0 && <EmptyChatState onAsk={onAsk} />}
+
           {messages.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {messages.map((m, i) => {
@@ -608,18 +675,22 @@ export default function AiPanel(props: AiPanelProps) {
         </div>
 
         <div style={{ flex: '0 0 auto', padding: '8px 12px 10px', borderTop: '1px solid rgba(255,255,255,.09)', background: '#191b1f' }}>
-          <div onClick={toggleSuggested} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
-            <span style={{ font: '500 10px Assistant,sans-serif', color: '#8F91A0' }}>שאלות מוצעות</span>
-            <span style={{ font: '400 10px Assistant,sans-serif', color: '#8F91A0' }}>{suggestedOpen ? '▲' : '▼'}</span>
-          </div>
-          {suggestedOpen && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginTop: 7 }}>
-              {SUGGESTED_QUESTIONS.map((q) => (
-                <span key={q} onClick={() => onAsk(q)} className="suggested-q" style={{ padding: '5px 8px', border: '1px solid rgba(255,255,255,.13)', borderRadius: 7, background: '#22252b', font: '400 11px Assistant,sans-serif', color: '#c8d0dd', cursor: 'pointer' }}>
-                  {q}
-                </span>
-              ))}
-            </div>
+          {messages.length > 0 && (
+            <>
+              <div onClick={toggleSuggested} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
+                <span style={{ font: '500 10px Assistant,sans-serif', color: '#8F91A0' }}>שאלות מוצעות</span>
+                <span style={{ font: '400 10px Assistant,sans-serif', color: '#8F91A0' }}>{suggestedOpen ? '▲' : '▼'}</span>
+              </div>
+              {suggestedOpen && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginTop: 7 }}>
+                  {SUGGESTED_QUESTIONS.map((q) => (
+                    <span key={q} onClick={() => onAsk(q)} className="suggested-q" style={{ padding: '5px 8px', border: '1px solid rgba(255,255,255,.13)', borderRadius: 7, background: '#22252b', font: '400 11px Assistant,sans-serif', color: '#c8d0dd', cursor: 'pointer' }}>
+                      {q}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </>
           )}
           <div
             style={{

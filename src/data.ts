@@ -109,9 +109,7 @@ export interface ChatMessage {
   time?: string;
 }
 
-export const INITIAL_MESSAGES: ChatMessage[] = [
-  { who: 'ai', text: 'תמונת המצב מוצגת מעל. אפשר לשאול בשפה חופשית על הפוליגון ועל טווח הזמנים שנבחרו.', time: '08:15' },
-];
+export const INITIAL_MESSAGES: ChatMessage[] = [];
 
 export function answerFor(q: string): Omit<ChatMessage, 'who'> {
   if (/(כמה|אילו|מה האירועים|רשימ)/.test(q)) {
