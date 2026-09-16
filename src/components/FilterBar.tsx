@@ -110,19 +110,21 @@ export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggle
         <div
           style={{
             pointerEvents: 'auto',
+            flex: '0 0 auto',
             width: 'max-content',
-            maxWidth: 'min(96%,780px)',
-            padding: '10px 12px',
+            minWidth: 492,
+            maxWidth: 'min(94%,660px)',
+            padding: '8px 10px',
             background: 'rgba(20,22,28,.72)',
             backdropFilter: 'blur(14px)',
             WebkitBackdropFilter: 'blur(14px)',
             border: '1px solid rgba(255,255,255,.1)',
-            borderRadius: 16,
+            borderRadius: 14,
             boxShadow: '0 20px 70px rgba(0,0,0,.5)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, marginBottom: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <Pill>
                 <TableIcon />
                 טבלת ישויות
@@ -132,7 +134,7 @@ export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggle
                 סינונים רוחביים
               </Pill>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
               <ToolIconBtn onClick={toggleDoc} active={docOpen} title="תיעוד מבצעי">
                 <PencilIcon />
               </ToolIconBtn>
@@ -145,10 +147,10 @@ export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggle
             </div>
           </div>
 
-          <div style={{ direction: 'ltr', display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <span style={{ font: '600 8.5px Assistant,sans-serif', color: '#8f97a6', letterSpacing: '.02em' }}>יכולות מתקדמות</span>
-              <div style={{ display: 'flex', gap: 4 }}>
+          <div style={{ direction: 'ltr', display: 'flex', alignItems: 'flex-start', gap: 8, minWidth: 'max-content' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <span style={{ font: '600 7.5px Assistant,sans-serif', color: '#8f97a6', letterSpacing: '.02em' }}>יכולות מתקדמות</span>
+              <div style={{ display: 'flex', gap: 3 }}>
                 {ADV_KEYS.map((key) => (
                   <AdvTile key={key} tileKey={key} layers={layers} docOpen={docOpen} toggleDoc={toggleDoc} toggleLayer={toggleLayer} />
                 ))}
@@ -157,17 +159,17 @@ export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggle
 
             <div style={{ width: 1, alignSelf: 'stretch', background: 'rgba(255,255,255,.1)' }} />
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <span style={{ font: '600 8.5px Assistant,sans-serif', color: '#8f97a6', letterSpacing: '.02em' }}>צד</span>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <div style={{ display: 'flex', gap: 4 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <span style={{ font: '600 7.5px Assistant,sans-serif', color: '#8f97a6', letterSpacing: '.02em' }}>צד</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <div style={{ display: 'flex', gap: 3 }}>
                   {STAT_ROW1.map((key) => {
                     const def = LAYERS.find((l) => l.key === key);
                     if (!def) return null;
                     return <StatTile key={key} def={def} on={!!layers[key]} onClick={() => toggleLayer(key)} />;
                   })}
                 </div>
-                <div style={{ display: 'flex', gap: 4 }}>
+                <div style={{ display: 'flex', gap: 3 }}>
                   {STAT_ROW2.map((key) => {
                     const def = LAYERS.find((l) => l.key === key);
                     if (!def) return null;
@@ -190,9 +192,9 @@ function ToolIconBtn({ onClick, active, title, children }: { onClick?: () => voi
       title={title}
       className="tool-icon-btn"
       style={{
-        width: 24,
-        height: 24,
-        borderRadius: 7,
+        width: 19,
+        height: 19,
+        borderRadius: 6,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -213,13 +215,13 @@ function Pill({ solid, children }: { solid?: boolean; children: ReactNode }) {
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 4,
-        height: 23,
-        padding: '0 9px',
-        borderRadius: 8,
+        gap: 3,
+        height: 19,
+        padding: '0 7px',
+        borderRadius: 7,
         cursor: 'pointer',
         whiteSpace: 'nowrap',
-        font: '600 9.5px Assistant,sans-serif',
+        font: '600 8.5px Assistant,sans-serif',
         background: solid ? '#1863e0' : 'rgba(255,255,255,.06)',
         color: solid ? '#ffffff' : '#c8d0dd',
         border: solid ? '1px solid #1863e0' : '1px solid rgba(255,255,255,.09)',
@@ -235,15 +237,15 @@ function StatTile({ def, on, onClick }: { def: (typeof LAYERS)[number]; on: bool
     <div
       onClick={onClick}
       style={{
-        flex: '0 0 62px',
+        flex: '0 0 48px',
         minWidth: 0,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 2,
-        padding: '6px 3px',
-        borderRadius: 10,
+        gap: 1,
+        padding: '4px 2px',
+        borderRadius: 8,
         cursor: 'pointer',
         textAlign: 'center',
         background: on ? hexA(def.color, 0.14) : 'rgba(255,255,255,.04)',
@@ -251,7 +253,7 @@ function StatTile({ def, on, onClick }: { def: (typeof LAYERS)[number]; on: bool
         transition: 'background 140ms cubic-bezier(.2,0,0,1)',
       }}
     >
-      <span style={{ font: '500 8.5px/1.2 Assistant,sans-serif', color: '#c9cedb' }}>
+      <span style={{ font: '500 7px/1.15 Assistant,sans-serif', color: '#c9cedb' }}>
         {def.label1}
         {def.label2 && (
           <>
@@ -260,7 +262,7 @@ function StatTile({ def, on, onClick }: { def: (typeof LAYERS)[number]; on: bool
           </>
         )}
       </span>
-      <span style={{ font: '700 14px Assistant,sans-serif', color: def.color }}>{def.value || '—'}</span>
+      <span style={{ font: '700 12px Assistant,sans-serif', color: def.color }}>{def.value || '—'}</span>
     </div>
   );
 }
@@ -294,22 +296,22 @@ function AdvTile({
     <div
       onClick={onClick}
       style={{
-        flex: '0 0 62px',
+        flex: '0 0 48px',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 4,
-        padding: '8px 3px',
-        borderRadius: 10,
+        gap: 3,
+        padding: '6px 2px',
+        borderRadius: 8,
         cursor: 'pointer',
         textAlign: 'center',
         background: on ? hexA(meta.color, 0.14) : 'rgba(255,255,255,.04)',
         border: `1px solid ${on ? meta.color : 'rgba(255,255,255,.08)'}`,
       }}
     >
-      <div style={{ width: 20, height: 20, borderRadius: 6, background: 'rgba(255,255,255,.07)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{meta.icon(meta.color)}</div>
-      <span style={{ font: '500 8.5px/1.2 Assistant,sans-serif', color: '#c9cedb' }}>
+      <div style={{ width: 16, height: 16, borderRadius: 5, background: 'rgba(255,255,255,.07)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{meta.icon(meta.color)}</div>
+      <span style={{ font: '500 7px/1.15 Assistant,sans-serif', color: '#c9cedb' }}>
         {meta.label1}
         {meta.label2 && (
           <>
@@ -324,7 +326,7 @@ function AdvTile({
 
 function PencilIcon() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#e7edf7" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#e7edf7" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" />
     </svg>
   );
@@ -332,7 +334,7 @@ function PencilIcon() {
 
 function RefreshIcon() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#e7edf7" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#e7edf7" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5" />
     </svg>
   );
@@ -340,7 +342,7 @@ function RefreshIcon() {
 
 function XIcon() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#e7edf7" strokeWidth={1.9} strokeLinecap="round">
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#e7edf7" strokeWidth={1.9} strokeLinecap="round">
       <path d="M18 6 6 18M6 6l12 12" />
     </svg>
   );

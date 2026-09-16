@@ -9,11 +9,11 @@ export default function AiFab({ onClick }: AiFabProps) {
       title="סוכן גזרה מבצעית"
       style={{
         position: 'fixed',
-        bottom: 20,
-        right: 20,
+        bottom: 16,
+        right: 16,
         zIndex: 650,
-        width: 56,
-        height: 56,
+        width: 40,
+        height: 40,
         borderRadius: '50%',
         background: 'linear-gradient(135deg,#4f7bff,#8a5cf6,#e05ad0)',
         display: 'flex',
@@ -23,7 +23,7 @@ export default function AiFab({ onClick }: AiFabProps) {
         boxShadow: '0 8px 28px rgba(90,60,220,.45), 0 0 0 1px rgba(255,255,255,.12)',
       }}
     >
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="url(#ai-fab-gradient)">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="url(#ai-fab-gradient)">
         <defs>
           <linearGradient id="ai-fab-gradient" x1="0" y1="0" x2="24" y2="24">
             <stop offset="0" stopColor="#ffffff" />

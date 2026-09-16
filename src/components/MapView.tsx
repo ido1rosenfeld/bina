@@ -126,11 +126,22 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView({ layer
       maxZoom: 19,
       attribution: 'Esri World Imagery',
     });
+    // A single stray tile (an edge tile at the view boundary, a transient
+    // network hiccup) fires 'tileerror' too and must not nuke the whole
+    // aerial layer — only fall back once errors pile up across many tiles,
+    // and remove Esri when we do so the street map never sits stacked on
+    // top of a still-mostly-working aerial layer.
+    let errorCount = 0;
     let fellBack = false;
     esri.on('tileerror', () => {
-      if (fellBack) return;
+      errorCount += 1;
+      if (fellBack || errorCount < 6) return;
       fellBack = true;
+      map.removeLayer(esri);
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: 'OpenStreetMap' }).addTo(map);
+    });
+    esri.on('tileload', () => {
+      errorCount = 0;
     });
     esri.addTo(map);
 

@@ -1,4 +1,21 @@
+import { useEffect, useState } from 'react';
+
+function formatClock(d: Date) {
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mo = String(d.getMonth() + 1).padStart(2, '0');
+  return { time: `${hh}:${mm}`, date: `${dd}/${mo}` };
+}
+
 export default function TopBar() {
+  const [now, setNow] = useState(() => formatClock(new Date()));
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(formatClock(new Date())), 15000);
+    return () => clearInterval(id);
+  }, []);
+
   return (
     <div
       dir="ltr"
@@ -21,8 +38,8 @@ export default function TopBar() {
     >
       <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', whiteSpace: 'nowrap' }}>
-          <span style={{ font: "600 13px/14px Assistant,sans-serif", color: '#E9F2FA', letterSpacing: '.01em' }}>08:15</span>
-          <span style={{ font: "400 10px/12px Assistant,sans-serif", color: '#7E8894' }}>15/05</span>
+          <span style={{ font: "600 13px/14px Assistant,sans-serif", color: '#E9F2FA', letterSpacing: '.01em' }}>{now.time}</span>
+          <span style={{ font: "400 10px/12px Assistant,sans-serif", color: '#7E8894' }}>{now.date}</span>
         </div>
         <div style={{ width: 1, height: 22, background: 'rgba(255,255,255,.1)' }} />
       </div>
