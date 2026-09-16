@@ -19,8 +19,8 @@ export default function App() {
 
   const [docOpen, setDocOpen] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
-  const [sectionAOpen, setSectionAOpen] = useState(true);
-  const [sectionBOpen, setSectionBOpen] = useState(true);
+  const [sectionAOpen, setSectionAOpen] = useState(false);
+  const [sectionBOpen, setSectionBOpen] = useState(false);
   const [graphsOn, setGraphsOn] = useState(false);
   const [highlight] = useState<string | null>(null);
   const [layers, setLayers] = useState<Record<string, boolean>>({ events: true, detect: true });

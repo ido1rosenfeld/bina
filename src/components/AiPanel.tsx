@@ -688,7 +688,7 @@ export default function AiPanel(props: AiPanelProps) {
           )}
         </div>
 
-        <div style={{ flex: '0 0 auto', padding: '8px 12px 10px', borderTop: '1px solid rgba(255,255,255,.09)', background: '#191b1f' }}>
+        <div style={{ flex: '0 0 auto', padding: '8px 14px 12px', background: '#14151a' }}>
           {messages.length > 0 && (
             <>
               <div onClick={toggleSuggested} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>

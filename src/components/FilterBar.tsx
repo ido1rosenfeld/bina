@@ -9,7 +9,8 @@ interface FilterBarProps {
   toggleLayer: (key: string) => void;
 }
 
-const ADV_KEYS = ['aman', 'doc', 'heat', 'history', 'shield'];
+const ADV_ROW1 = ['aman', 'doc', 'heat'];
+const ADV_ROW2 = ['history', 'shield'];
 const STAT_ROW1 = ['infra', 'events', 'reports', 'detect'];
 const STAT_ROW2 = ['capture', 'targets', 'tahak', 'sabotage'];
 
@@ -112,7 +113,7 @@ export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggle
             pointerEvents: 'auto',
             flex: '0 0 auto',
             width: 'max-content',
-            minWidth: 492,
+            minWidth: 390,
             maxWidth: 'min(94%,660px)',
             padding: '8px 10px',
             background: 'rgba(20,22,28,.72)',
@@ -150,10 +151,17 @@ export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggle
           <div style={{ direction: 'ltr', display: 'flex', alignItems: 'flex-start', gap: 8, minWidth: 'max-content' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               <span style={{ font: '600 7.5px Assistant,sans-serif', color: '#8f97a6', letterSpacing: '.02em' }}>יכולות מתקדמות</span>
-              <div style={{ display: 'flex', gap: 3 }}>
-                {ADV_KEYS.map((key) => (
-                  <AdvTile key={key} tileKey={key} layers={layers} docOpen={docOpen} toggleDoc={toggleDoc} toggleLayer={toggleLayer} />
-                ))}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <div style={{ display: 'flex', gap: 3 }}>
+                  {ADV_ROW1.map((key) => (
+                    <AdvTile key={key} tileKey={key} layers={layers} docOpen={docOpen} toggleDoc={toggleDoc} toggleLayer={toggleLayer} />
+                  ))}
+                </div>
+                <div style={{ display: 'flex', gap: 3 }}>
+                  {ADV_ROW2.map((key) => (
+                    <AdvTile key={key} tileKey={key} layers={layers} docOpen={docOpen} toggleDoc={toggleDoc} toggleLayer={toggleLayer} />
+                  ))}
+                </div>
               </div>
             </div>
 
