@@ -1,4 +1,4 @@
-import type { MouseEvent, ReactNode } from 'react';
+import { useState, type MouseEvent, type ReactNode } from 'react';
 import { EVENTS, GRAPHS, CATS, SUGGESTED_QUESTIONS, SEVERITY_BREAKDOWN } from '../data';
 import type { ChatMessage } from '../data';
 
@@ -20,8 +20,9 @@ interface AiPanelProps {
   highlight: string | null;
   onOpenEventList: (title: string) => void;
   onOpenEvent: (id: string) => void;
-  rating: number | null;
-  setRating: (n: number) => void;
+  dateFrom: string;
+  dateTo: string;
+  onEditDates: (from: string, to: string) => void;
   reportClaim: ReportClaim | null;
   reportCat: string | null;
   reportDone: boolean;
@@ -168,6 +169,14 @@ function PieIcon() {
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 12A9 9 0 1 1 12 3v9Z" />
       <path d="M21 12A9 9 0 0 0 12 3" />
+    </svg>
+  );
+}
+
+function PencilIcon({ size = 11 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" />
     </svg>
   );
 }
@@ -347,8 +356,9 @@ export default function AiPanel(props: AiPanelProps) {
     highlight,
     onOpenEventList,
     onOpenEvent,
-    rating,
-    setRating,
+    dateFrom,
+    dateTo,
+    onEditDates,
     reportClaim,
     reportCat,
     reportDone,
@@ -369,6 +379,20 @@ export default function AiPanel(props: AiPanelProps) {
   } = props;
 
   const topEvents = EVENTS.filter((e) => e.sev >= 3);
+  const [editingDates, setEditingDates] = useState(false);
+  const [dateFromDraft, setDateFromDraft] = useState(dateFrom);
+  const [dateToDraft, setDateToDraft] = useState(dateTo);
+
+  function startEditDates() {
+    setDateFromDraft(dateFrom);
+    setDateToDraft(dateTo);
+    setEditingDates(true);
+  }
+
+  function saveDates() {
+    onEditDates(dateFromDraft.trim() || dateFrom, dateToDraft.trim() || dateTo);
+    setEditingDates(false);
+  }
 
   function handleExport() {
     if (!sectionAOpen) toggleSectionA();
@@ -410,8 +434,43 @@ export default function AiPanel(props: AiPanelProps) {
 
       <div style={{ flex: '0 0 auto', display: 'flex', flexDirection: 'column', gap: 9, padding: '10px 14px', borderBottom: '1px solid rgba(255,255,255,.13)', background: '#1B1C1D' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ font: '700 15px Assistant,sans-serif', color: '#E6F5FF' }}>תובנות</span>
+          <span style={{ font: '700 15px Assistant,sans-serif', color: '#E6F5FF' }}>סוכן בינה מבצעית</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {editingDates ? (
+              <div style={{ direction: 'ltr', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <input
+                  value={dateFromDraft}
+                  onChange={(e) => setDateFromDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') saveDates();
+                  }}
+                  style={{ width: 40, height: 20, padding: '0 5px', background: '#1B1C1D', border: '1px solid rgba(255,255,255,.2)', borderRadius: 4, color: '#E6F5FF', font: '400 10px Assistant,sans-serif', outline: 'none', textAlign: 'center' }}
+                />
+                <span style={{ color: '#8F91A0', font: '400 10px Assistant,sans-serif' }}>–</span>
+                <input
+                  value={dateToDraft}
+                  onChange={(e) => setDateToDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') saveDates();
+                  }}
+                  style={{ width: 40, height: 20, padding: '0 5px', background: '#1B1C1D', border: '1px solid rgba(255,255,255,.2)', borderRadius: 4, color: '#E6F5FF', font: '400 10px Assistant,sans-serif', outline: 'none', textAlign: 'center' }}
+                />
+                <span onClick={saveDates} title="שמירה" style={{ color: '#7fdcab', cursor: 'pointer', font: '700 12px Assistant,sans-serif' }}>
+                  ✓
+                </span>
+              </div>
+            ) : (
+              <span
+                onClick={startEditDates}
+                title="עריכת טווח תאריכים"
+                style={{ direction: 'ltr', display: 'flex', alignItems: 'center', gap: 5, height: 20, padding: '0 8px', borderRadius: 4, background: 'rgba(0,0,0,.25)', border: '1px solid rgba(255,255,255,.13)', font: '500 10px Assistant,sans-serif', color: '#c8d0dd', cursor: 'pointer' }}
+              >
+                {dateFrom}–{dateTo}
+                <span style={{ color: '#8F91A0', display: 'flex' }}>
+                  <PencilIcon size={9} />
+                </span>
+              </span>
+            )}
             <span onClick={handleExport} title="ייצוא ל-PDF" style={{ font: '400 14px Assistant,sans-serif', color: '#8F91A0', cursor: 'pointer' }}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8F91A0" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 3v12m0 0-4-4m4 4 4-4" />
@@ -422,11 +481,6 @@ export default function AiPanel(props: AiPanelProps) {
               ✕
             </span>
           </div>
-        </div>
-        <div>
-          <span style={{ display: 'inline-flex', alignItems: 'center', height: 20, padding: '0 8px', borderRadius: 4, background: 'rgba(0,0,0,.25)', border: '1px solid rgba(255,255,255,.13)', font: '500 10px Assistant,sans-serif', color: '#c8d0dd' }}>
-            סיכום תמונת מצב
-          </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
           <NavPill color="#30a46c" onClick={() => jumpTo('section-a', sectionAOpen, toggleSectionA)}>
@@ -609,36 +663,6 @@ export default function AiPanel(props: AiPanelProps) {
           </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 12px', border: '1px solid rgba(255,255,255,.13)', borderRadius: 9, background: '#22252b' }}>
-            <span style={{ font: '500 11px Assistant,sans-serif', color: '#c8d0dd' }}>האם המידע עזר לך?</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              {[1, 2, 3, 4, 5].map((n) => {
-                const on = rating === n;
-                return (
-                  <span
-                    key={n}
-                    onClick={() => setRating(n)}
-                    style={{
-                      width: 24,
-                      height: 24,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      border: `1px solid ${on ? '#2f6d4f' : 'rgba(255,255,255,.13)'}`,
-                      background: on ? 'rgba(48,164,108,.18)' : '#2b2e34',
-                      borderRadius: 6,
-                      font: '600 11px Assistant,sans-serif',
-                      color: on ? '#7fdcab' : '#c8d0dd',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {n}
-                  </span>
-                );
-              })}
-            </div>
-          </div>
-
           {messages.length === 0 && <EmptyChatState onAsk={onAsk} />}
 
           {messages.length > 0 && (
@@ -748,7 +772,7 @@ export default function AiPanel(props: AiPanelProps) {
               </svg>
             </div>
           </div>
-          <div style={{ marginTop: 6, font: '400 9px Assistant,sans-serif', color: '#8F91A0' }}>שאלות אחזור נענות כעובדה; מגמות וסיבתיות מסומנות כהערכה.</div>
+          <div style={{ marginTop: 6, font: '400 9px Assistant,sans-serif', color: '#8F91A0' }}>יכולות מבוססות AI עשויות לטעות, יש להפעיל שיקול דעת מבצעי.</div>
         </div>
       </div>
 

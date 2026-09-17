@@ -29,7 +29,8 @@ export default function App() {
   const [listOpen, setListOpen] = useState(false);
   const [listTitle, setListTitle] = useState('');
   const [eventOpenId, setEventOpenId] = useState<string | null>(null);
-  const [rating, setRating] = useState<number | null>(null);
+  const [dateFrom, setDateFrom] = useState('12/05');
+  const [dateTo, setDateTo] = useState('15/05');
   const [reportClaim, setReportClaim] = useState<ReportClaim | null>(null);
   const [reportCat, setReportCat] = useState<string | null>(null);
   const [reportDone, setReportDone] = useState(false);
@@ -120,8 +121,12 @@ export default function App() {
           highlight={highlight}
           onOpenEventList={openEventList}
           onOpenEvent={(id) => setEventOpenId(id)}
-          rating={rating}
-          setRating={setRating}
+          dateFrom={dateFrom}
+          dateTo={dateTo}
+          onEditDates={(from, to) => {
+            setDateFrom(from);
+            setDateTo(to);
+          }}
           reportClaim={reportClaim}
           reportCat={reportCat}
           reportDone={reportDone}
