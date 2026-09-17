@@ -60,6 +60,14 @@ function FactSpan({ children, onClick, color = '#9ec3ff' }: { children: ReactNod
   );
 }
 
+function SubLabel({ children }: { children: ReactNode }) {
+  return (
+    <div style={{ font: '700 10px Assistant,sans-serif', color: '#8b93a3', letterSpacing: '.03em', marginBottom: 4 }}>
+      {children}
+    </div>
+  );
+}
+
 function BotAvatar() {
   return (
     <div
@@ -503,12 +511,25 @@ export default function AiPanel(props: AiPanelProps) {
           <div>
             <SectionHeader id="section-a" color="#8b93a3" icon={<ClipboardIcon />} title="חלק א׳ - קרקע ומאפייני סביבה" open={sectionAOpen} onToggle={toggleSectionA} />
             {sectionAOpen && (
-              <div style={{ border: '1px solid rgba(255,255,255,.09)', borderTop: 'none', borderRadius: '0 0 9px 9px', padding: '10px 12px', background: '#1c1e24' }}>
-                <div style={{ font: '400 13px/1.75 Assistant,sans-serif', color: '#E6F5FF' }}>
-                  גזרת <LinkSpan onClick={onJumpArea}>{AREA_LINKS[0]}</LinkSpan> בגודל 4.2 קמ״ר במרחב חאן יונס, מאופיינת ברכס מרכזי בציר מזרח־מערב ובשני אגני ניקוז. בתוכה
-                  הישובים <LinkSpan onClick={onJumpArea}>{AREA_LINKS[1]}</LinkSpan> ו<LinkSpan onClick={onJumpArea}>{AREA_LINKS[2]}</LinkSpan>, והצירים המרכזיים בה הם{' '}
-                  <LinkSpan onClick={onJumpArea}>{AREA_LINKS[3]}</LinkSpan> ו<LinkSpan onClick={onJumpArea}>{AREA_LINKS[4]}</LinkSpan>. בגזרה 3 איתורים רגישים: מבנה 934/C
-                  (מבנה רב קומות), יעד E19 (פתח מנהרה) ומתקן ציבורי בצומת הצפון.
+              <div style={{ border: '1px solid rgba(255,255,255,.09)', borderTop: 'none', borderRadius: '0 0 9px 9px', padding: '10px 12px', background: '#1c1e24', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div>
+                  <SubLabel>כללי</SubLabel>
+                  <div style={{ font: '400 13px/1.75 Assistant,sans-serif', color: '#E6F5FF' }}>
+                    גזרת <LinkSpan onClick={onJumpArea}>{AREA_LINKS[0]}</LinkSpan> בגודל 4.2 קמ״ר במרחב חאן יונס, מאופיינת ברכס מרכזי בציר מזרח־מערב ובשני אגני ניקוז. בתוכה
+                    הישובים <LinkSpan onClick={onJumpArea}>{AREA_LINKS[1]}</LinkSpan> ו<LinkSpan onClick={onJumpArea}>{AREA_LINKS[2]}</LinkSpan>.
+                  </div>
+                </div>
+                <div>
+                  <SubLabel>צירים</SubLabel>
+                  <div style={{ font: '400 13px/1.75 Assistant,sans-serif', color: '#E6F5FF' }}>
+                    הצירים המרכזיים בגזרה הם <LinkSpan onClick={onJumpArea}>{AREA_LINKS[3]}</LinkSpan> ו<LinkSpan onClick={onJumpArea}>{AREA_LINKS[4]}</LinkSpan>, המשמשים כעורקי התנועה הראשיים לאורך הרכס המרכזי ובין הישובים בגזרה.
+                  </div>
+                </div>
+                <div>
+                  <SubLabel>מבנים</SubLabel>
+                  <div style={{ font: '400 13px/1.75 Assistant,sans-serif', color: '#E6F5FF' }}>
+                    בגזרה 3 איתורים רגישים: מבנה 934/C (מבנה רב קומות), יעד E19 (פתח מנהרה) ומתקן ציבורי בצומת הצפון.
+                  </div>
                 </div>
               </div>
             )}
