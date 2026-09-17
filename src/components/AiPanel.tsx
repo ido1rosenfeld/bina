@@ -485,15 +485,15 @@ export default function AiPanel(props: AiPanelProps) {
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-          <NavPill color="#8b93a3" onClick={() => jumpTo('section-a', sectionAOpen, toggleSectionA)}>
+          <NavPill color="#a1a1aa" onClick={() => jumpTo('section-a', sectionAOpen, toggleSectionA)}>
             <ClipboardIcon />
             קרקע וסביבה
           </NavPill>
-          <NavPill color="#e5484d" onClick={() => jumpTo('section-b', sectionBOpen, toggleSectionB)}>
+          <NavPill color="#ff4d4f" onClick={() => jumpTo('section-b', sectionBOpen, toggleSectionB)}>
             <ClockIcon />
             התרחשיות
           </NavPill>
-          <NavPill color="#5b9bff" onClick={() => jumpTo('section-c', graphsOn, toggleGraphs)}>
+          <NavPill color="#3b82f6" onClick={() => jumpTo('section-c', graphsOn, toggleGraphs)}>
             <PieIcon />
             גרפים
           </NavPill>
@@ -509,7 +509,7 @@ export default function AiPanel(props: AiPanelProps) {
           </div>
 
           <div>
-            <SectionHeader id="section-a" color="#8b93a3" icon={<ClipboardIcon />} title="חלק א׳ - קרקע ומאפייני סביבה" open={sectionAOpen} onToggle={toggleSectionA} />
+            <SectionHeader id="section-a" color="#a1a1aa" icon={<ClipboardIcon />} title="קרקע ומאפייני סביבה" open={sectionAOpen} onToggle={toggleSectionA} />
             {sectionAOpen && (
               <div style={{ border: '1px solid rgba(255,255,255,.09)', borderTop: 'none', borderRadius: '0 0 9px 9px', padding: '10px 12px', background: '#1c1e24', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div>
@@ -536,7 +536,7 @@ export default function AiPanel(props: AiPanelProps) {
           </div>
 
           <div>
-            <SectionHeader id="section-b" color="#e5484d" icon={<ClockIcon />} title="חלק ב׳ - התרחשיות מבצעיות בתקופה" open={sectionBOpen} onToggle={toggleSectionB} />
+            <SectionHeader id="section-b" color="#ff4d4f" icon={<ClockIcon />} title="התרחשיות מבצעיות בתקופה" open={sectionBOpen} onToggle={toggleSectionB} />
             {sectionBOpen && (
               <div style={{ border: '1px solid rgba(255,255,255,.09)', borderTop: 'none', borderRadius: '0 0 9px 9px', padding: '10px 12px', background: '#1c1e24' }}>
                 <div style={{ font: '400 13px/1.85 Assistant,sans-serif', color: '#E6F5FF', marginBottom: 10 }}>
@@ -626,7 +626,7 @@ export default function AiPanel(props: AiPanelProps) {
           </div>
 
           <div>
-            <SectionHeader id="section-c" color="#5b9bff" icon={<PieIcon />} title="חלק ג׳ - גרפים ומגמות" open={graphsOn} onToggle={toggleGraphs} />
+            <SectionHeader id="section-c" color="#3b82f6" icon={<PieIcon />} title="גרפים ומגמות" open={graphsOn} onToggle={toggleGraphs} />
             {graphsOn && (
               <div style={{ border: '1px solid rgba(255,255,255,.09)', borderTop: 'none', borderRadius: '0 0 9px 9px', padding: '12px', background: '#1c1e24', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
