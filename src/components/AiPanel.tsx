@@ -126,12 +126,6 @@ function MessageActions({ text }: { text: string }) {
           <path d="M5 15V5a2 2 0 0 1 2-2h10" />
         </svg>
       </MsgIconBtn>
-      <MsgIconBtn title="שתף">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 3v12M7 8l5-5 5 5" />
-          <path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" />
-        </svg>
-      </MsgIconBtn>
       <MsgIconBtn title="מועיל">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
           <path d="M7 11v9H4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3Zm0 0 3.5-7A2 2 0 0 1 12 3v0a2 2 0 0 1 2 2.2L13.5 9H19a2 2 0 0 1 2 2.3l-1.1 7A2 2 0 0 1 17.9 20H10a3 3 0 0 1-3-3v-6Z" />
