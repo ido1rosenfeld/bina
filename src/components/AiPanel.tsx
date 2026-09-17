@@ -494,8 +494,6 @@ export default function AiPanel(props: AiPanelProps) {
 
       <div style={{ flex: '1 1 auto', minWidth: 0, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <div id="ai-scroll" style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <span style={{ font: '400 10px Assistant,sans-serif', color: '#8F91A0', direction: 'ltr', alignSelf: 'flex-end' }}>מבוסס בינה מלאכותית, יש להפעיל שיקול דעת בשימוש</span>
-
           <div id="print-report" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div className="print-only" style={{ marginBottom: 4 }}>
             <div style={{ font: '700 16px Assistant,sans-serif', color: '#E6F5FF' }}>דוח תמונת מצב — חרבות ברזל · חטיבה 188</div>
