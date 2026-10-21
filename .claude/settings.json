@@ -1,0 +1,18 @@
+{
+  "extraKnownMarketplaces": {
+    "superpowers-marketplace": {
+      "source": { "source": "github", "repo": "obra/superpowers-marketplace" }
+    },
+    "ui-ux-pro-max-skill": {
+      "source": { "source": "github", "repo": "nextlevelbuilder/ui-ux-pro-max-skill" }
+    },
+    "karpathy-skills": {
+      "source": { "source": "github", "repo": "forrestchang/andrej-karpathy-skills" }
+    }
+  },
+  "enabledPlugins": {
+    "superpowers@superpowers-marketplace": true,
+    "ui-ux-pro-max@ui-ux-pro-max-skill": true,
+    "andrej-karpathy-skills@karpathy-skills": true
+  }
+}
