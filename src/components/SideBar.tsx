@@ -1,12 +1,21 @@
-import { useState, type ReactNode } from 'react';
-import { SIDEBAR_W } from '../data';
+import type { ReactNode } from 'react';
+import { SIDEBAR_W, type RoleId } from '../data';
 
 interface SideBarProps {
+  role: RoleId;
+  roleShort: string;
+  activeKey: string | null;
+  onItem: (id: string) => void;
   aiOpen: boolean;
   onToggleAi: () => void;
 }
 
-const ITEMS: { id: string; label: string; icon: ReactNode }[] = [
+type Item = { id: string; label: string; icon: ReactNode };
+
+const MISSION: Item = { id: 'mission', label: 'דפית משימה', icon: <path d="M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h4" /> };
+
+const AGAM: Item[] = [
+  MISSION,
   { id: 'orders', label: 'פקודות והערכת מצב', icon: <path d="M4 5h6v6H4zM14 6h6M14 10h6M4 15h6M4 19h6M14 15h6v4h-6z" /> },
   { id: 'files', label: 'תיקים ותכניות', icon: <path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" /> },
   { id: 'sync', label: 'סנכרון וניהול הלחימה', icon: <path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01" /> },
@@ -16,9 +25,34 @@ const ITEMS: { id: string; label: string; icon: ReactNode }[] = [
   { id: 'rokak', label: 'רוק"ק', icon: <path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0-4 0M5 5l5 5M19 5l-5 5M5 19l5-5M19 19l-5-5" /> },
 ];
 
-export default function SideBar({ aiOpen, onToggleAi }: SideBarProps) {
-  const [active, setActive] = useState<string | null>(null);
+const EXPOSURE: Item[] = [
+  { id: 'shift', label: 'ניהול משמרת', icon: <path d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM16 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM2 20c.8-3 3-4.5 6-4.5s5.2 1.5 6 4.5M14 15.6c.6-.1 1.3-.1 2-.1 3 0 5.2 1.5 6 4.5" /> },
+  { id: 'area', label: 'ארגון שטח', icon: <path d="M6 4 18 6l2 12-14 2zM6 4a1.5 1.5 0 1 0 0 .1M18 6a1.5 1.5 0 1 0 0 .1M20 18a1.5 1.5 0 1 0 0 .1M6 20a1.5 1.5 0 1 0 0 .1" /> },
+  { id: 'recs', label: 'תור המלצות', icon: <path d="M9 3 3 5v16l6-2 6 2 6-2V3l-6 2-6-2ZM9 3v16M15 5v16" /> },
+  { id: 'hits', label: 'הבוקים', icon: <path d="M12 3 21 12 12 21 3 12zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z" /> },
+  { id: 'targets', label: 'סינון מטרות', icon: <path d="M3 4h18l-7 8v6l-4 2v-8z" /> },
+  { id: 'mapstates', label: 'מצבי מפה', icon: <path d="M6 3h12v18l-6-4-6 4z" /> },
+  { id: 'log', label: 'יומן', icon: <path d="M5 4h11l3 3v13H5zM9 9h6M9 13h6M9 17h3" /> },
+];
 
+const FIRE: Item[] = [
+  { id: 'firemissions', label: 'משימות אש', icon: <path d="M12 3c3 4 6 6 6 11a6 6 0 0 1-12 0c0-3 2-5 3-7 1 2 3 3 3-4Z" /> },
+  { id: 'targets', label: 'מטרות', icon: <path d="M12 12m-8 0a8 8 0 1 0 16 0a8 8 0 1 0-16 0M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0-6 0" /> },
+  { id: 'air', label: 'סיוע אווירי', icon: <path d="M2 14l9-2 3-8 2 1-1 7 7 2v2l-7-1-2 5h-2l1-5-8 1z" /> },
+  { id: 'coord', label: 'תיאום אש', icon: <path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01" /> },
+  { id: 'log', label: 'יומן', icon: <path d="M5 4h11l3 3v13H5zM9 9h6M9 13h6M9 17h3" /> },
+];
+
+const INTEL: Item[] = [
+  { id: 'collect', label: 'משימות איסוף', icon: <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0-6 0M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z" /> },
+  { id: 'products', label: 'תוצרי מודיעין', icon: <path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" /> },
+  { id: 'targets', label: 'בנק מטרות', icon: <path d="M12 12m-8 0a8 8 0 1 0 16 0a8 8 0 1 0-16 0M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0-6 0" /> },
+  { id: 'log', label: 'יומן', icon: <path d="M5 4h11l3 3v13H5zM9 9h6M9 13h6M9 17h3" /> },
+];
+
+const ITEMS: Record<RoleId, Item[]> = { agam: AGAM, fire: FIRE, exposure: EXPOSURE, intel: INTEL };
+
+export default function SideBar({ role, roleShort, activeKey, onItem, aiOpen, onToggleAi }: SideBarProps) {
   return (
     <div
       dir="rtl"
@@ -41,12 +75,12 @@ export default function SideBar({ aiOpen, onToggleAi }: SideBarProps) {
       <div style={{ font: '600 9.5px/1.2 Assistant,sans-serif', color: '#9AA6B2', textAlign: 'center', marginBottom: 10 }}>
         יכולות
         <br />
-        אג"ם
+        {roleShort}
       </div>
 
       <div style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, width: '100%' }}>
-        {ITEMS.map((it) => (
-          <SideItem key={it.id} label={it.label} active={active === it.id} onClick={() => setActive((a) => (a === it.id ? null : it.id))}>
+        {ITEMS[role].map((it) => (
+          <SideItem key={it.id} label={it.label} active={activeKey === it.id} onClick={() => onItem(it.id)}>
             {it.icon}
           </SideItem>
         ))}

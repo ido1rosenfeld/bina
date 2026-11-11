@@ -1,4 +1,6 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
+import { ROLES, type RoleId } from '../data';
 
 function formatClock(d: Date) {
   const p = (n: number) => String(n).padStart(2, '0');
@@ -38,8 +40,25 @@ function TwoLine({ top, bottom }: { top: string; bottom: string }) {
   );
 }
 
-export default function TopBar() {
+export default function TopBar({ role, onRole }: { role: RoleId; onRole: (r: RoleId) => void }) {
   const [now, setNow] = useState(() => formatClock(new Date()));
+  const [menu, setMenu] = useState<{ top: number; right: number; width: number } | null>(null);
+  const roleBtn = useRef<HTMLDivElement | null>(null);
+  const current = ROLES.find((r) => r.id === role) ?? ROLES[0];
+
+  useEffect(() => {
+    if (!menu) return;
+    const close = () => setMenu(null);
+    window.addEventListener('click', close);
+    return () => window.removeEventListener('click', close);
+  }, [menu]);
+
+  function toggleMenu(e: MouseEvent) {
+    e.stopPropagation();
+    if (menu) return setMenu(null);
+    const r = roleBtn.current?.getBoundingClientRect();
+    if (r) setMenu({ top: r.bottom + 6, right: window.innerWidth - r.right, width: r.width });
+  }
 
   useEffect(() => {
     const id = setInterval(() => setNow(formatClock(new Date())), 1000);
@@ -126,7 +145,7 @@ export default function TopBar() {
           <path d="M4 4.5A1 1 0 0 1 5 3.5h25a1 1 0 0 1 1 1v27.7c-1.7 5.3-5.3 9.5-10.8 12.6-.4.2-.9.2-1.3 0C13.2 41.6 9.5 37.3 8 32.2V4.5Z" fill="#2A2D30" />
           <path d="M17.5 10v20M11 16l6.5 6 6.5-6" stroke="#d9b779" strokeWidth={2.2} strokeLinecap="round" />
         </svg>
-        <TwoLine top="מציאות מבצעית" bottom='אג"ם' />
+        <TwoLine top="מציאות מבצעית" bottom={current.name} />
       </div>
 
       <div style={{ flex: '1 1 auto', minWidth: 8 }} />
@@ -138,12 +157,12 @@ export default function TopBar() {
             <path d="M9.6 4v16M3 12h6.6" />
           </Icon>
         </div>
-        <div className="pill-btn" style={{ ...PILL, gap: 10, height: 32, padding: '0 8px', minWidth: 170, justifyContent: 'space-between' }}>
+        <div ref={roleBtn} onClick={toggleMenu} className="pill-btn" style={{ ...PILL, gap: 10, height: 32, padding: '0 8px', minWidth: 170, justifyContent: 'space-between', cursor: 'pointer', borderColor: menu ? 'rgba(91,155,255,.6)' : 'rgba(255,255,255,.12)' }}>
           <Chevron />
           <div dir="rtl" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', whiteSpace: 'nowrap' }}>
-              <span style={{ font: '500 10px/12px Assistant,sans-serif', color: '#9AA6B2' }}>צי"ד אג"ם</span>
-              <span style={{ font: '700 12.5px/14px Assistant,sans-serif', color: '#E9F2FA' }}>אג"ם</span>
+              <span style={{ font: '500 10px/12px Assistant,sans-serif', color: '#9AA6B2' }}>{current.unit}</span>
+              <span style={{ font: '700 12.5px/14px Assistant,sans-serif', color: '#E9F2FA' }}>{current.name}</span>
             </div>
             <span style={{ width: 22, height: 22, borderRadius: 5, background: 'rgba(255,255,255,.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Icon size={12}>
@@ -163,6 +182,33 @@ export default function TopBar() {
           </Icon>
         </div>
       </div>
+      {menu &&
+        createPortal(
+        <div
+          dir="rtl"
+          onClick={(e) => e.stopPropagation()}
+          style={{ position: 'fixed', top: menu.top, right: menu.right, width: Math.max(menu.width, 190), zIndex: 1000, padding: 6, borderRadius: 10, background: '#1f2226', border: '1px solid rgba(255,255,255,.12)', boxShadow: '0 16px 44px rgba(0,0,0,.55)' }}
+        >
+          {ROLES.map((r) => {
+            const on = r.id === role;
+            return (
+              <div
+                key={r.id}
+                onClick={() => {
+                  onRole(r.id);
+                  setMenu(null);
+                }}
+                className="bar-pill"
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 34, padding: '0 10px', borderRadius: 7, cursor: 'pointer', background: on ? 'rgba(31,111,235,.22)' : 'transparent', color: on ? '#cfe0ff' : '#e7edf7', font: `${on ? 700 : 500} 13px Assistant,sans-serif` }}
+              >
+                {r.name}
+                {on && <span style={{ color: '#8fb8ff' }}>✓</span>}
+              </div>
+            );
+          })}
+        </div>,
+          document.body,
+        )}
     </div>
   );
 }

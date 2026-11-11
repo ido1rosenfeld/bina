@@ -7,6 +7,7 @@ interface FilterBarProps {
   toggleDoc: () => void;
   layers: Record<string, boolean>;
   toggleLayer: (key: string) => void;
+  onClose?: () => void;
 }
 
 const STAT_KEYS = ['reports', 'targets', 'detect', 'sabotage', 'events', 'tahak', 'infra', 'capture'];
@@ -21,7 +22,7 @@ const GLASS = {
   boxShadow: '0 18px 60px rgba(0,0,0,.45)',
 } as const;
 
-export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggleLayer }: FilterBarProps) {
+export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggleLayer, onClose }: FilterBarProps) {
   const [timeBarOpen, setTimeBarOpen] = useState(true);
   const [timeMode, setTimeMode] = useState(TIME_MODES[0]);
 
@@ -95,7 +96,7 @@ export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggle
               <IconBtn title="תיעוד מבצעי" onClick={toggleDoc} active={docOpen}>
                 <PencilIcon />
               </IconBtn>
-              <IconBtn title="סגור">
+              <IconBtn title="סגור" onClick={onClose}>
                 <XIcon />
               </IconBtn>
             </div>

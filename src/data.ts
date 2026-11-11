@@ -56,6 +56,7 @@ export const LAYERS: LayerDef[] = [
 ];
 
 export const SIDEBAR_W = 58;
+export const RECS_W = 340;
 
 export const MAP_CENTER: [number, number] = [31.5215, 34.453];
 
@@ -266,3 +267,35 @@ export function hexA(hex: string, a: number): string {
   const n = parseInt(hex.slice(1), 16);
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
 }
+
+export type RoleId = 'agam' | 'fire' | 'exposure' | 'intel';
+
+export const ROLES: { id: RoleId; name: string; unit: string; short: string }[] = [
+  { id: 'agam', name: 'אג"ם', unit: 'צי"ד אג"ם', short: 'אג"ם' },
+  { id: 'fire', name: 'אש אוויר', unit: 'צי"ד אש', short: 'אש' },
+  { id: 'exposure', name: 'חשיפת תקיפה', unit: 'צי"ד אש', short: 'חשיפה' },
+  { id: 'intel', name: 'מודיעין ואיסוף', unit: 'צי"ד מודיעין', short: 'מודיעין' },
+];
+
+export interface RecItem {
+  id: string;
+  title: string;
+  score: string;
+  age: string;
+  cls: string;
+  level: string;
+  grid: string;
+  desc: string;
+  creator: string;
+  owner: string;
+  created: string;
+  dy: number;
+  dx: number;
+}
+
+export const RECS: RecItem[] = [
+  { id: 'א8197', title: 'איתור צי"ד', score: '5.0', age: '12 דק׳', cls: 'אדם', level: 'חשוד חזותי', grid: '669602 : 716244', desc: '2 ב"א', creator: 'קמ"ן גדוד 9', owner: 'גדמ"ר צפון', created: '11.11.2026 16:03:12', dy: 0.9, dx: -2.0 },
+  { id: 'א8194', title: 'איתור צי"ד', score: '5.0', age: '38 דק׳', cls: 'רכב', level: 'חשוד חזותי', grid: '669455 : 716090', desc: 'רכב מסחרי לבן', creator: 'צוות איתור', owner: 'גדמ"ר צפון', created: '11.11.2026 15:37:48', dy: -0.4, dx: 0.6 },
+  { id: 'א8190', title: 'תנועה חשודה', score: '4.2', age: '51 דק׳', cls: 'אדם', level: 'מודיעיני', grid: '669710 : 716301', desc: 'תנועה בפתח מבנה', creator: 'אמ"ן', owner: 'גדמ"ר דרום', created: '11.11.2026 15:24:05', dy: 1.2, dx: 2.2 },
+  { id: 'א0907', title: 'איתור צי"ד', score: '5.0', age: '39 דק׳', cls: 'אדם', level: 'חשוד חזותי', grid: '669518 : 716177', desc: '3 ב"א', creator: 'קמ"ן גדוד 9', owner: 'גדמ"ר צפון', created: '11.11.2026 15:41:37', dy: -0.6, dx: -2.3 },
+];

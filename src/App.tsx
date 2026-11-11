@@ -8,8 +8,12 @@ import EventListOverlay from './components/EventListOverlay';
 import EventCardModal from './components/EventCardModal';
 import EntityHoverCard from './components/EntityHoverCard';
 import EntityCard, { type EntityPatch } from './components/EntityCard';
-import { ENTITIES, EVENTS, INITIAL_MESSAGES, SIDEBAR_W, answerFor } from './data';
-import type { ChatMessage } from './data';
+import MissionSheet from './components/MissionSheet';
+import RecsPanel from './components/RecsPanel';
+import JournalBar from './components/JournalBar';
+import ConfirmDialog from './components/ConfirmDialog';
+import { ENTITIES, EVENTS, INITIAL_MESSAGES, RECS, RECS_W, ROLES, SIDEBAR_W, answerFor, offsetCoord } from './data';
+import type { ChatMessage, RecItem, RoleId } from './data';
 
 interface ReportClaim {
   id: string;
@@ -45,7 +49,59 @@ export default function App() {
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const [entityEdits, setEntityEdits] = useState<Record<string, EntityPatch>>({});
 
-  const mapRight = `${SIDEBAR_W + (aiOpen ? panelW : 0)}px`;
+  const [role, setRole] = useState<RoleId>('agam');
+  const [sideActive, setSideActive] = useState<string | null>(null);
+  const [missionOpen, setMissionOpen] = useState(false);
+  const [recsOpen, setRecsOpen] = useState(false);
+  const [queueIds, setQueueIds] = useState(() => RECS.slice(0, -1).map((r) => r.id));
+  const [mineIds, setMineIds] = useState(() => [RECS[RECS.length - 1].id]);
+  const [activeRecId, setActiveRecId] = useState<string | null>(RECS[RECS.length - 1].id);
+  const [historyAsk, setHistoryAsk] = useState<RecItem | null>(null);
+  const [historyBarOpen, setHistoryBarOpen] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const exposure = role === 'exposure';
+  const rightPanelW = aiOpen ? panelW : recsOpen ? RECS_W : 0;
+  const mapRight = `${SIDEBAR_W + rightPanelW}px`;
+  const recById = (id: string) => RECS.find((r) => r.id === id);
+  const queueRecs = queueIds.map(recById).filter((r) => r !== undefined);
+  const mineRecs = mineIds.map(recById).filter((r) => r !== undefined);
+  const activeRec = activeRecId && mineIds.includes(activeRecId) ? (recById(activeRecId) ?? null) : null;
+
+  function showToast(msg: string) {
+    setToast(msg);
+    window.setTimeout(() => setToast((t) => (t === msg ? null : t)), 2600);
+  }
+
+  function changeRole(r: RoleId) {
+    setRole(r);
+    setSideActive(null);
+    setRecsOpen(false);
+    setHistoryBarOpen(false);
+    setHistoryAsk(null);
+  }
+
+  function onSideItem(id: string) {
+    if (id === 'mission') return setMissionOpen(true);
+    if (id === 'recs') {
+      setAiOpen(false);
+      return setRecsOpen((v) => !v);
+    }
+    setSideActive((a) => (a === id ? null : id));
+  }
+
+  function toggleAi() {
+    if (aiOpen) return closeAi();
+    setRecsOpen(false);
+    setAiOpen(true);
+  }
+
+  function openHistoryForRec(rec: RecItem) {
+    const [lat, lng] = offsetCoord(rec.dy, rec.dx);
+    setHistoryAsk(null);
+    setHistoryBarOpen(true);
+    mapRef.current?.jumpTo(`${lat}, ${lng}`);
+  }
   const entities = ENTITIES.map((e) => ({ ...e, ...entityEdits[e.id] }));
   const hoverEntity = hoverOpen ? entities.find((e) => e.id === selectedEntityId) : undefined;
   const cardEntities = cardIds.map((id) => entities.find((e) => e.id === id)).filter((e) => e !== undefined);
@@ -145,17 +201,86 @@ export default function App() {
         onSelectEntity={selectEntity}
         onEntityAnchor={setEntityAnchor}
       />
-      <TopBar />
+      <TopBar role={role} onRole={changeRole} />
+      {(!exposure || historyBarOpen) && (
       <FilterBar
         mapRight={mapRight}
+        onClose={exposure ? () => setHistoryBarOpen(false) : undefined}
         docOpen={docOpen}
         toggleDoc={() => setDocOpen((v) => !v)}
         layers={layers}
         toggleLayer={toggleLayer}
       />
-      <SideBar aiOpen={aiOpen} onToggleAi={() => (aiOpen ? closeAi() : setAiOpen(true))} />
+      )}
+      {exposure && !historyBarOpen && (
+        <JournalBar
+          mapRight={mapRight}
+          activeRec={activeRec}
+          onSubmit={(_, tab) => showToast(activeRec ? `התיאור נוסף להמלצה ${activeRec.id}` : `הדיווח נוסף ליומן · ${tab}`)}
+          onFinishRec={(verdict) => {
+            if (!activeRec) return;
+            setMineIds((ids) => ids.filter((x) => x !== activeRec.id));
+            setActiveRecId(null);
+            showToast(`הטיפול בהמלצה ${activeRec.id} הסתיים · ${verdict}`);
+          }}
+        />
+      )}
+      <SideBar
+        role={role}
+        roleShort={ROLES.find((r) => r.id === role)?.short ?? ''}
+        activeKey={recsOpen ? 'recs' : missionOpen ? 'mission' : sideActive}
+        onItem={onSideItem}
+        aiOpen={aiOpen}
+        onToggleAi={toggleAi}
+      />
+      {recsOpen && (
+        <RecsPanel
+          queue={queueRecs}
+          mine={mineRecs}
+          activeId={activeRecId}
+          onTake={(id) => {
+            setQueueIds((ids) => ids.filter((x) => x !== id));
+            setMineIds((ids) => [...ids, id]);
+            setActiveRecId(id);
+          }}
+          onReject={(id) => {
+            setQueueIds((ids) => ids.filter((x) => x !== id));
+            showToast(`ההמלצה ${id} נדחתה`);
+          }}
+          onOpenRec={setHistoryAsk}
+          onActivate={setActiveRecId}
+          onClose={() => setRecsOpen(false)}
+        />
+      )}
+      {historyAsk && (
+        <div style={{ position: 'absolute', top: 44, bottom: 0, left: 0, right: mapRight, zIndex: 880, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(5,7,10,.25)' }} onClick={() => setHistoryAsk(null)}>
+          <ConfirmDialog
+            title="האם ברצונך לפתוח את סרגל ההיסטוריה הגזרתית?"
+            body={`הסרגל יציג את ההתרחשויות, התשתיות והמגמות בגזרה סביב ${historyAsk.title} ${historyAsk.id}.`}
+            confirmLabel="כן, פתח סרגל"
+            onConfirm={() => openHistoryForRec(historyAsk)}
+            onCancel={() => setHistoryAsk(null)}
+          />
+        </div>
+      )}
+      {missionOpen && (
+        <MissionSheet
+          onClose={() => setMissionOpen(false)}
+          onToast={showToast}
+          onOpenBina={() => {
+            setMissionOpen(false);
+            setRecsOpen(false);
+            setAiOpen(true);
+          }}
+        />
+      )}
+      {toast && (
+        <div dir="rtl" style={{ position: 'absolute', top: 58, left: '50%', transform: 'translateX(-50%)', zIndex: 1100, padding: '9px 16px', borderRadius: 10, background: '#1f2a3d', border: '1px solid rgba(77,141,255,.45)', color: '#e7edf7', font: '600 12.5px Assistant,sans-serif', boxShadow: '0 12px 36px rgba(0,0,0,.5)' }}>
+          {toast}
+        </div>
+      )}
       {hoverEntity && entityAnchor && (
-        <EntityHoverCard entity={hoverEntity} anchor={entityAnchor} rightInset={SIDEBAR_W + (aiOpen ? panelW : 0)} onClose={() => selectEntity(null)} onView={() => viewEntity(hoverEntity.id)} />
+        <EntityHoverCard entity={hoverEntity} anchor={entityAnchor} rightInset={SIDEBAR_W + rightPanelW} onClose={() => selectEntity(null)} onView={() => viewEntity(hoverEntity.id)} />
       )}
       {cardEntities.length > 0 && activeCardId && (
         <EntityCard

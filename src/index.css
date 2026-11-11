@@ -207,3 +207,10 @@ input, textarea {
 .entity-acc-head:hover {
   background: rgba(255, 255, 255, 0.03);
 }
+
+@keyframes dlg-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+}
