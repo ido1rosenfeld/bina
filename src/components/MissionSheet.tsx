@@ -1,12 +1,16 @@
-import { useState, type ReactNode } from 'react';
-import { aerialTileUrl, offsetCoord } from '../data';
+import { useEffect, useState, type ReactNode } from 'react';
 import ConfirmDialog from './ConfirmDialog';
+import MapView from './MapView';
+import FilterBar from './FilterBar';
 
 interface MissionSheetProps {
   onClose: () => void;
-  onOpenBina: () => void;
   onToast: (msg: string) => void;
+  layers: Record<string, boolean>;
+  toggleLayer: (key: string) => void;
 }
+
+const noop = () => {};
 
 const STATUSES = ['ממתין', 'בביצוע', 'הושלם'];
 
@@ -23,7 +27,7 @@ const FIELD = {
   textAlign: 'right',
 } as const;
 
-export default function MissionSheet({ onClose, onOpenBina, onToast }: MissionSheetProps) {
+export default function MissionSheet({ onClose, onToast, layers, toggleLayer }: MissionSheetProps) {
   const [title, setTitle] = useState('The Goat');
   const [phases, setPhases] = useState([
     { name: 'היערכות', status: 'ממתין' },
@@ -33,12 +37,14 @@ export default function MissionSheet({ onClose, onOpenBina, onToast }: MissionSh
   ]);
   const [askHistory, setAskHistory] = useState(true);
   const [full, setFull] = useState(false);
-  const [lat, lng] = offsetCoord(0.2, 0.3);
+  const [bina, setBina] = useState<'off' | 'loading' | 'on'>('off');
+  const [docOpen, setDocOpen] = useState(false);
 
-  const tiles = [-1, 0, 1].flatMap((dy) => [-1, 0, 1].map((dx) => ({ dy, dx })));
-  const base = aerialTileUrl(lat, lng, 15).split('/');
-  const [z, ty, tx] = base.slice(-3).map(Number);
-  const tileRoot = base.slice(0, -3).join('/');
+  useEffect(() => {
+    if (bina !== 'loading') return;
+    const t = window.setTimeout(() => setBina('on'), 750);
+    return () => window.clearTimeout(t);
+  }, [bina]);
 
   return (
     <div
@@ -152,7 +158,7 @@ export default function MissionSheet({ onClose, onOpenBina, onToast }: MissionSh
                 <input defaultValue="662323/501096" style={{ ...FIELD, height: 32, direction: 'ltr', textAlign: 'right' }} />
                 <span
                   title="היסטוריה גזרתית סביב הנ״צ"
-                  onClick={() => setAskHistory(true)}
+                  onClick={() => bina === 'off' && setAskHistory(true)}
                   className="bar-pill"
                   style={{ width: 32, height: 32, flex: '0 0 32px', borderRadius: 7, background: 'rgba(31,111,235,.2)', border: '1px solid rgba(77,141,255,.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#9ec3ff' }}
                 >
@@ -165,33 +171,37 @@ export default function MissionSheet({ onClose, onOpenBina, onToast }: MissionSh
             </Row>
           </div>
 
-          <div style={{ flex: '1 1 auto', position: 'relative', overflow: 'hidden', background: 'repeating-linear-gradient(135deg,#3a3d42 0 8px,#33363b 8px 16px)' }}>
-            <div style={{ position: 'absolute', left: '50%', top: '50%', width: 768, height: 768, transform: 'translate(-50%,-50%)', display: 'grid', gridTemplateColumns: 'repeat(3,256px)' }}>
-              {tiles.map((t) => (
-                <img
-                  key={`${t.dy}-${t.dx}`}
-                  alt=""
-                  src={`${tileRoot}/${z}/${ty + t.dy}/${tx + t.dx}`}
-                  onError={(e) => {
-                    e.currentTarget.style.visibility = 'hidden';
-                  }}
-                  style={{ width: 256, height: 256, display: 'block' }}
-                />
-              ))}
-            </div>
-            <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-100%)', color: '#ff5c5c', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,.6))' }}>
+          <div style={{ flex: '1 1 auto', position: 'relative', overflow: 'hidden', background: '#14151a' }}>
+            <MapView layers={layers} mapRight="0px" selectedEntityId={null} onSelectEntity={noop} onEntityAnchor={noop} />
+            <div style={{ position: 'absolute', left: '50%', top: '50%', zIndex: 500, pointerEvents: 'none', transform: 'translate(-50%,-100%)', color: '#ff5c5c', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,.6))' }}>
               <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" stroke="#fff" strokeWidth={1.2}>
                 <path d="M12 22s-7-6.4-7-12a7 7 0 0 1 14 0c0 5.6-7 12-7 12Z" />
                 <circle cx="12" cy="10" r="2.6" fill="#fff" />
               </svg>
             </div>
+            {bina === 'loading' && (
+              <div style={{ position: 'absolute', left: 0, right: 0, bottom: 24, zIndex: 700, display: 'flex', justifyContent: 'center' }}>
+                <div className="bina-in" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', borderRadius: 12, background: 'rgba(26,28,33,.94)', border: '1px solid rgba(255,255,255,.12)', color: '#e7edf7', font: '600 12.5px Assistant,sans-serif', boxShadow: '0 16px 44px rgba(0,0,0,.5)' }}>
+                  <span className="bina-spin" style={{ width: 16, height: 16, borderRadius: '50%', border: '2px solid rgba(158,195,255,.25)', borderTopColor: '#9ec3ff' }} />
+                  הורוס בינה טוען היסטוריה גזרתית סביב הנ״צ…
+                </div>
+              </div>
+            )}
+            {bina === 'on' && (
+              <div className="bina-in" style={{ position: 'absolute', inset: 0, zIndex: 600, pointerEvents: 'none' }}>
+                <FilterBar mapRight="0px" docOpen={docOpen} toggleDoc={() => setDocOpen((v) => !v)} layers={layers} toggleLayer={toggleLayer} onClose={() => setBina('off')} />
+              </div>
+            )}
             {askHistory && (
-              <div style={{ position: 'absolute', left: 0, right: 0, bottom: 20, display: 'flex', justifyContent: 'center' }}>
+              <div style={{ position: 'absolute', left: 0, right: 0, bottom: 20, zIndex: 700, display: 'flex', justifyContent: 'center' }}>
                 <ConfirmDialog
                   title={'האם ברצונך לקבל היסטוריה גזרתית סביב הנ"צ?'}
                   body="הורוס בינה יסכם את ההתרחשויות, התשתיות והמגמות בגזרה סביב המיקום שנבחר."
                   confirmLabel="כן, פתח בהורוס בינה"
-                  onConfirm={onOpenBina}
+                  onConfirm={() => {
+                    setAskHistory(false);
+                    setBina('loading');
+                  }}
                   onCancel={() => setAskHistory(false)}
                 />
               </div>

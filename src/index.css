@@ -214,3 +214,24 @@ input, textarea {
     transform: translateY(6px) scale(0.98);
   }
 }
+
+.bina-in {
+  animation: bina-in 420ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes bina-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+.bina-spin {
+  animation: bina-spin 800ms linear infinite;
+}
+
+@keyframes bina-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

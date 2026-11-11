@@ -264,15 +264,7 @@ export default function App() {
         </div>
       )}
       {missionOpen && (
-        <MissionSheet
-          onClose={() => setMissionOpen(false)}
-          onToast={showToast}
-          onOpenBina={() => {
-            setMissionOpen(false);
-            setRecsOpen(false);
-            setAiOpen(true);
-          }}
-        />
+        <MissionSheet onClose={() => setMissionOpen(false)} onToast={showToast} layers={layers} toggleLayer={toggleLayer} />
       )}
       {toast && (
         <div dir="rtl" style={{ position: 'absolute', top: 58, left: '50%', transform: 'translateX(-50%)', zIndex: 1100, padding: '9px 16px', borderRadius: 10, background: '#1f2a3d', border: '1px solid rgba(77,141,255,.45)', color: '#e7edf7', font: '600 12.5px Assistant,sans-serif', boxShadow: '0 12px 36px rgba(0,0,0,.5)' }}>
