@@ -384,6 +384,7 @@ export default function AiPanel(props: AiPanelProps) {
   const [editingDates, setEditingDates] = useState(false);
   const [dateFromDraft, setDateFromDraft] = useState(dateFrom);
   const [dateToDraft, setDateToDraft] = useState(dateTo);
+  const [exportedAt, setExportedAt] = useState('');
 
   function startEditDates() {
     setDateFromDraft(dateFrom);
@@ -400,6 +401,7 @@ export default function AiPanel(props: AiPanelProps) {
     if (!sectionAOpen) toggleSectionA();
     if (!sectionBOpen) toggleSectionB();
     if (!graphsOn) toggleGraphs();
+    setExportedAt(new Date().toLocaleString('he-IL'));
     setTimeout(() => window.print(), 300);
   }
 
@@ -505,7 +507,7 @@ export default function AiPanel(props: AiPanelProps) {
           <div id="print-report" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div className="print-only" style={{ marginBottom: 4 }}>
             <div style={{ font: '700 16px Assistant,sans-serif', color: '#E6F5FF' }}>דוח תמונת מצב — חרבות ברזל · חטיבה 188</div>
-            <div style={{ font: '400 11px Assistant,sans-serif', color: '#8F91A0' }}>הופק בתאריך {new Date().toLocaleString('he-IL')}</div>
+            <div style={{ font: '400 11px Assistant,sans-serif', color: '#8F91A0' }}>הופק בתאריך {exportedAt}</div>
           </div>
 
           <div>
@@ -528,7 +530,7 @@ export default function AiPanel(props: AiPanelProps) {
                 <div>
                   <SubLabel>מבנים</SubLabel>
                   <div style={{ font: '400 13px/1.75 Assistant,sans-serif', color: '#E6F5FF' }}>
-                    בגזרה 3 איתורים רגישים: מבנה 934/C (מבנה רב קומות), יעד E19 (פתח מנהרה) ומתקן ציבורי בצומת הצפון.
+                    בגזרה 3 איתורים רגישים: מבנה <bdi dir="ltr">934/C</bdi> (מבנה רב קומות), יעד E19 (פתח מנהרה) ומתקן ציבורי בצומת הצפון.
                   </div>
                 </div>
               </div>

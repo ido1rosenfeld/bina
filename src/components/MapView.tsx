@@ -1,20 +1,31 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { ENTITIES, MAP_CENTER as CENTER, offsetCoord as off } from '../data';
 
 export interface MapViewHandle {
   jumpTo: (coord: string) => void;
+  focusEntity: (id: string) => void;
+}
+
+export interface ScreenPoint {
+  x: number;
+  y: number;
 }
 
 interface MapViewProps {
   layers: Record<string, boolean>;
   mapRight: string;
+  selectedEntityId: string | null;
+  onSelectEntity: (id: string | null) => void;
+  onEntityAnchor: (p: ScreenPoint | null) => void;
 }
 
-const CENTER: [number, number] = [31.5215, 34.453];
-// Local offset helper: dy/dx are small synthetic deltas (not real survey data),
-// used only to scatter mock markers around the demo center point.
-const off = (dy: number, dx: number): [number, number] => [CENTER[0] + dy * 0.001, CENTER[1] + dx * 0.001];
+const ENTITY_GLYPH =
+  '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#06232b" stroke-width="2.6" stroke-linecap="round"><path d="M3 13h18M8 13l4-5 4 5"/></svg>';
+
+const SELECT_BRACKETS =
+  '<svg width="34" height="34" viewBox="0 0 34 34" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M2 10V2h8M24 2h8v8M32 24v8h-8M10 32H2v-8"/></svg>';
 
 function buildLayerGroups(map: L.Map) {
   const dot = (color: string, size: number) =>
@@ -82,28 +93,36 @@ function buildBaseLayers(map: L.Map) {
   const xIcon = L.divIcon({ className: '', html: '<div class="opsmap-xmark">&#10005;</div>', iconSize: [16, 16] });
   ([[1.2, -3.0], [0.9, -2.6], [0.3, -2.9], [-0.4, -2.4], [-1.1, -3.1], [-1.4, -1.9], [-0.9, -0.9], [-0.2, -0.2], [0.5, -0.3], [1.0, 0.6], [0.6, 1.2], [-0.1, 1.1], [-0.8, 0.6], [-1.5, 1.2], [1.2, 2.2], [0.4, 2.6], [-0.3, 2.2], [-1.2, 2.8], [1.6, 1.4], [-1.7, -0.4]] as [number, number][])
     .forEach((p) => L.marker(off(p[0], p[1]), { icon: xIcon }).addTo(map));
-
-  (
-    [
-      ['A/1/C', 0.8, -1.6],
-      ['934/C', 1.1, -2.4],
-      ['E19', -0.5, -2.2],
-      ['A/2/E', -1.3, -0.2],
-      ['931/A', 0.7, 1.9],
-      ['A/4/B', 1.3, 2.5],
-      ['A/1/F', -0.6, 2.9],
-      ['50/A/1', -1.5, -1.0],
-    ] as [string, number, number][]
-  ).forEach(([t, dy, dx]) =>
-    L.marker(off(dy, dx), { icon: L.divIcon({ className: '', html: `<div class="opsmap-tag">${t}</div>`, iconSize: [46, 12] }) }).addTo(map),
-  );
 }
 
-const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView({ layers, mapRight }, ref) {
+function buildEntityMarkers(map: L.Map, onClick: (id: string) => void) {
+  ENTITIES.forEach((e) => {
+    const icon = L.divIcon({
+      className: '',
+      iconSize: [90, 20],
+      iconAnchor: [10, 10],
+      html: `<div class="opsmap-entity" dir="ltr"><span class="opsmap-entity-ic">${ENTITY_GLYPH}</span><span class="opsmap-tag">${e.tag}</span></div>`,
+    });
+    L.marker(off(e.dy, e.dx), { icon, zIndexOffset: 500, riseOnHover: true })
+      .on('click', (ev) => {
+        L.DomEvent.stopPropagation(ev);
+        onClick(e.id);
+      })
+      .addTo(map);
+  });
+}
+
+const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView({ layers, mapRight, selectedEntityId, onSelectEntity, onEntityAnchor }, ref) {
   const elRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const layerGroupsRef = useRef<Record<string, L.Layer> | null>(null);
   const pinRef = useRef<L.CircleMarker | null>(null);
+  const onSelectRef = useRef(onSelectEntity);
+  const onAnchorRef = useRef(onEntityAnchor);
+  useEffect(() => {
+    onSelectRef.current = onSelectEntity;
+    onAnchorRef.current = onEntityAnchor;
+  });
 
   useImperativeHandle(ref, () => ({
     jumpTo(coord: string) {
@@ -114,6 +133,12 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView({ layer
       map.setView(parts, 17, { animate: true });
       if (pinRef.current) map.removeLayer(pinRef.current);
       pinRef.current = L.circleMarker(parts, { radius: 9, color: '#ff4d4f', weight: 2, fillColor: '#ff4d4f', fillOpacity: 0.5 }).addTo(map);
+    },
+    focusEntity(id: string) {
+      const map = mapRef.current;
+      const entity = ENTITIES.find((e) => e.id === id);
+      if (!map || !entity) return;
+      map.setView(off(entity.dy, entity.dx), Math.max(map.getZoom(), 17), { animate: true });
     },
   }));
 
@@ -146,6 +171,8 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView({ layer
     esri.addTo(map);
 
     buildBaseLayers(map);
+    buildEntityMarkers(map, (id) => onSelectRef.current(id));
+    map.on('click', () => onSelectRef.current(null));
 
     mapRef.current = map;
     layerGroupsRef.current = buildLayerGroups(map);
@@ -180,6 +207,31 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView({ layer
   useEffect(() => {
     mapRef.current?.invalidateSize({ pan: false, animate: false });
   }, [mapRight]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    const entity = ENTITIES.find((e) => e.id === selectedEntityId);
+    if (!map || !entity) {
+      onAnchorRef.current(null);
+      return;
+    }
+    const latlng = L.latLng(off(entity.dy, entity.dx));
+    const brackets = L.marker(latlng, {
+      icon: L.divIcon({ className: 'opsmap-select', html: SELECT_BRACKETS, iconSize: [34, 34], iconAnchor: [17, 17] }),
+      interactive: false,
+      zIndexOffset: 1000,
+    }).addTo(map);
+    const report = () => {
+      const p = map.latLngToContainerPoint(latlng);
+      onAnchorRef.current({ x: p.x, y: p.y });
+    };
+    report();
+    map.on('move zoom resize', report);
+    return () => {
+      map.off('move zoom resize', report);
+      map.removeLayer(brackets);
+    };
+  }, [selectedEntityId]);
 
   return <div ref={elRef} style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: mapRight, zIndex: 0 }} />;
 });

@@ -1,12 +1,14 @@
 import { useRef, useState, type MouseEvent } from 'react';
 import TopBar from './components/TopBar';
-import MapView, { type MapViewHandle } from './components/MapView';
+import MapView, { type MapViewHandle, type ScreenPoint } from './components/MapView';
 import FilterBar from './components/FilterBar';
 import AiPanel from './components/AiPanel';
 import AiFab from './components/AiFab';
 import EventListOverlay from './components/EventListOverlay';
 import EventCardModal from './components/EventCardModal';
-import { EVENTS, INITIAL_MESSAGES, answerFor } from './data';
+import EntityHoverCard from './components/EntityHoverCard';
+import EntityCard, { type EntityPatch } from './components/EntityCard';
+import { ENTITIES, EVENTS, INITIAL_MESSAGES, answerFor } from './data';
 import type { ChatMessage } from './data';
 
 interface ReportClaim {
@@ -36,8 +38,41 @@ export default function App() {
   const [reportDone, setReportDone] = useState(false);
   const [draft, setDraft] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
+  const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
+  const [hoverOpen, setHoverOpen] = useState(false);
+  const [entityAnchor, setEntityAnchor] = useState<ScreenPoint | null>(null);
+  const [cardIds, setCardIds] = useState<string[]>([]);
+  const [activeCardId, setActiveCardId] = useState<string | null>(null);
+  const [entityEdits, setEntityEdits] = useState<Record<string, EntityPatch>>({});
 
   const mapRight = aiOpen ? `${panelW}px` : '0px';
+  const entities = ENTITIES.map((e) => ({ ...e, ...entityEdits[e.id] }));
+  const hoverEntity = hoverOpen ? entities.find((e) => e.id === selectedEntityId) : undefined;
+  const cardEntities = cardIds.map((id) => entities.find((e) => e.id === id)).filter((e) => e !== undefined);
+
+  function selectEntity(id: string | null) {
+    setSelectedEntityId(id);
+    setHoverOpen(id !== null);
+  }
+
+  function viewEntity(id: string) {
+    setCardIds((ids) => (ids.includes(id) ? ids : [...ids, id]));
+    setActiveCardId(id);
+    setHoverOpen(false);
+  }
+
+  function closeEntityCard(id: string) {
+    const rest = cardIds.filter((x) => x !== id);
+    setCardIds(rest);
+    setActiveCardId(rest[rest.length - 1] ?? null);
+    if (selectedEntityId === id) setSelectedEntityId(null);
+  }
+
+  function activateEntityCard(id: string) {
+    setActiveCardId(id);
+    setSelectedEntityId(id);
+    setHoverOpen(false);
+  }
 
   function toggleLayer(key: string) {
     setLayers((s) => ({ ...s, [key]: !s[key] }));
@@ -102,9 +137,40 @@ export default function App() {
 
   return (
     <div dir="rtl" style={{ position: 'fixed', inset: 0, background: '#14151a', color: '#e7edf7', overflow: 'hidden', fontFamily: 'Assistant,system-ui,sans-serif' }}>
-      <MapView ref={mapRef} layers={layers} mapRight={mapRight} />
+      <MapView
+        ref={mapRef}
+        layers={layers}
+        mapRight={mapRight}
+        selectedEntityId={selectedEntityId}
+        onSelectEntity={selectEntity}
+        onEntityAnchor={setEntityAnchor}
+      />
       <TopBar />
-      <FilterBar mapRight={mapRight} docOpen={docOpen} toggleDoc={() => setDocOpen((v) => !v)} layers={layers} toggleLayer={toggleLayer} />
+      <FilterBar
+        mapRight={mapRight}
+        docOpen={docOpen}
+        toggleDoc={() => setDocOpen((v) => !v)}
+        layers={layers}
+        toggleLayer={toggleLayer}
+        aiOpen={aiOpen}
+        onOpenAi={() => setAiOpen((v) => !v)}
+      />
+      {hoverEntity && entityAnchor && (
+        <EntityHoverCard entity={hoverEntity} anchor={entityAnchor} rightInset={aiOpen ? panelW : 0} onClose={() => selectEntity(null)} onView={() => viewEntity(hoverEntity.id)} />
+      )}
+      {cardEntities.length > 0 && activeCardId && (
+        <EntityCard
+          entities={cardEntities}
+          activeId={activeCardId}
+          onActivate={activateEntityCard}
+          onClose={closeEntityCard}
+          onSave={(id, patch) => setEntityEdits((s) => ({ ...s, [id]: patch }))}
+          onLocate={(id) => {
+            setSelectedEntityId(id);
+            mapRef.current?.focusEntity(id);
+          }}
+        />
+      )}
       {!aiOpen && <AiFab onClick={() => setAiOpen(true)} />}
 
       {aiOpen && (
