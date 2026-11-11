@@ -200,6 +200,10 @@ input, textarea {
   filter: brightness(1.18);
 }
 
+.side-btn:hover {
+  filter: brightness(1.25);
+}
+
 .entity-acc-head:hover {
   background: rgba(255, 255, 255, 0.03);
 }

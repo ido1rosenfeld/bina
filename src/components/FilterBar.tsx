@@ -7,8 +7,6 @@ interface FilterBarProps {
   toggleDoc: () => void;
   layers: Record<string, boolean>;
   toggleLayer: (key: string) => void;
-  aiOpen: boolean;
-  onOpenAi: () => void;
 }
 
 const STAT_KEYS = ['reports', 'targets', 'detect', 'sabotage', 'events', 'tahak', 'infra', 'capture'];
@@ -23,7 +21,7 @@ const GLASS = {
   boxShadow: '0 18px 60px rgba(0,0,0,.45)',
 } as const;
 
-export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggleLayer, aiOpen, onOpenAi }: FilterBarProps) {
+export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggleLayer }: FilterBarProps) {
   const [timeBarOpen, setTimeBarOpen] = useState(true);
   const [timeMode, setTimeMode] = useState(TIME_MODES[0]);
 
@@ -89,9 +87,6 @@ export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggle
                 סינונים רוחבים
               </Pill>
               <Pill icon={<TableIcon />}>טבלת ישויות</Pill>
-              <Pill active={aiOpen} onClick={onOpenAi} icon={<ChatIcon />}>
-                צ׳אט ותובנות
-              </Pill>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <IconBtn title="רענון">
@@ -331,14 +326,6 @@ function TableIcon() {
     <Svg size={13}>
       <rect x="3" y="4" width="18" height="16" rx="2" />
       <path d="M3 10h18M3 15h18M9 4v16M15 4v16" />
-    </Svg>
-  );
-}
-
-function ChatIcon() {
-  return (
-    <Svg size={13}>
-      <path d="M21 11.5a8.4 8.4 0 0 1-12.2 7.5L3 21l2-5.3A8.4 8.4 0 1 1 21 11.5Z" />
     </Svg>
   );
 }

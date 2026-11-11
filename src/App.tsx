@@ -3,12 +3,12 @@ import TopBar from './components/TopBar';
 import MapView, { type MapViewHandle, type ScreenPoint } from './components/MapView';
 import FilterBar from './components/FilterBar';
 import AiPanel from './components/AiPanel';
-import AiFab from './components/AiFab';
+import SideBar from './components/SideBar';
 import EventListOverlay from './components/EventListOverlay';
 import EventCardModal from './components/EventCardModal';
 import EntityHoverCard from './components/EntityHoverCard';
 import EntityCard, { type EntityPatch } from './components/EntityCard';
-import { ENTITIES, EVENTS, INITIAL_MESSAGES, answerFor } from './data';
+import { ENTITIES, EVENTS, INITIAL_MESSAGES, SIDEBAR_W, answerFor } from './data';
 import type { ChatMessage } from './data';
 
 interface ReportClaim {
@@ -45,7 +45,7 @@ export default function App() {
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const [entityEdits, setEntityEdits] = useState<Record<string, EntityPatch>>({});
 
-  const mapRight = aiOpen ? `${panelW}px` : '0px';
+  const mapRight = `${SIDEBAR_W + (aiOpen ? panelW : 0)}px`;
   const entities = ENTITIES.map((e) => ({ ...e, ...entityEdits[e.id] }));
   const hoverEntity = hoverOpen ? entities.find((e) => e.id === selectedEntityId) : undefined;
   const cardEntities = cardIds.map((id) => entities.find((e) => e.id === id)).filter((e) => e !== undefined);
@@ -97,7 +97,7 @@ export default function App() {
     const startX = e.clientX;
     const startW = panelW;
     const move = (ev: globalThis.MouseEvent) => {
-      const w = Math.max(300, Math.min(window.innerWidth - 160, startW + (startX - ev.clientX)));
+      const w = Math.max(300, Math.min(window.innerWidth - 160 - SIDEBAR_W, startW + (startX - ev.clientX)));
       setPanelW(w);
     };
     const up = () => {
@@ -152,11 +152,10 @@ export default function App() {
         toggleDoc={() => setDocOpen((v) => !v)}
         layers={layers}
         toggleLayer={toggleLayer}
-        aiOpen={aiOpen}
-        onOpenAi={() => setAiOpen((v) => !v)}
       />
+      <SideBar aiOpen={aiOpen} onToggleAi={() => (aiOpen ? closeAi() : setAiOpen(true))} />
       {hoverEntity && entityAnchor && (
-        <EntityHoverCard entity={hoverEntity} anchor={entityAnchor} rightInset={aiOpen ? panelW : 0} onClose={() => selectEntity(null)} onView={() => viewEntity(hoverEntity.id)} />
+        <EntityHoverCard entity={hoverEntity} anchor={entityAnchor} rightInset={SIDEBAR_W + (aiOpen ? panelW : 0)} onClose={() => selectEntity(null)} onView={() => viewEntity(hoverEntity.id)} />
       )}
       {cardEntities.length > 0 && activeCardId && (
         <EntityCard
@@ -171,7 +170,6 @@ export default function App() {
           }}
         />
       )}
-      {!aiOpen && <AiFab onClick={() => setAiOpen(true)} />}
 
       {aiOpen && (
         <AiPanel

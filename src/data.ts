@@ -55,6 +55,8 @@ export const LAYERS: LayerDef[] = [
   { key: 'aman', label1: 'מגן', label2: 'אמ"ן', value: '312', color: '#a78bfa', group: 'aman' },
 ];
 
+export const SIDEBAR_W = 58;
+
 export const MAP_CENTER: [number, number] = [31.5215, 34.453];
 
 // Synthetic offsets (not real survey data) used to scatter mock map content around the demo center.

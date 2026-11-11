@@ -1,6 +1,7 @@
 import { useState, type MouseEvent, type ReactNode } from 'react';
 import { EVENTS, GRAPHS, CATS, SUGGESTED_QUESTIONS, SEVERITY_BREAKDOWN } from '../data';
 import type { ChatMessage } from '../data';
+import { SIDEBAR_W } from '../data';
 
 interface ReportClaim {
   id: string;
@@ -422,7 +423,7 @@ export default function AiPanel(props: AiPanelProps) {
       style={{
         position: 'fixed',
         top: 44,
-        right: 0,
+        right: SIDEBAR_W,
         bottom: 0,
         width: panelW,
         zIndex: 700,
