@@ -1,5 +1,8 @@
 import { useState, type ReactNode } from 'react';
 import { LAYERS, SHOTS, hexA } from '../data';
+import { activeFilterCount, type FilterLayout, type FilterState } from '../filters';
+import { CrossPanel, FloatingFilterPanel, LayerTimePanel } from './filters/FilterPanels';
+import { TimeStrip } from './filters/TimeFilter';
 
 interface FilterBarProps {
   mapRight: string;
@@ -8,11 +11,20 @@ interface FilterBarProps {
   layers: Record<string, boolean>;
   toggleLayer: (key: string) => void;
   onClose?: () => void;
+  filters: FilterState;
+  setFilters: (f: FilterState) => void;
+  filterLayout: FilterLayout;
+  setFilterLayout: (l: FilterLayout) => void;
+  /** Distance of the floating filter window from the top of the map area. */
+  topInset?: number;
 }
 
 const STAT_KEYS = ['reports', 'targets', 'detect', 'sabotage', 'events', 'tahak', 'infra', 'capture'];
 
-const TIME_MODES = ['אי פעם', 'ימים לאחור', 'טווח זמנים'];
+const LAYOUTS: { id: FilterLayout; label: string; title: string }[] = [
+  { id: 'docked', label: 'מעוגן', title: 'תצוגה א׳ — סינונים רוחביים מימין לסרגל, זמן ושכבות משמאל' },
+  { id: 'floating', label: 'צף', title: 'תצוגה ב׳ — כל הסינונים בחלון צף משמאל, וסינון זמנים מעל הסרגל' },
+];
 
 const GLASS = {
   background: 'rgba(46,48,53,.8)',
@@ -22,128 +34,141 @@ const GLASS = {
   boxShadow: '0 18px 60px rgba(0,0,0,.45)',
 } as const;
 
-export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggleLayer, onClose }: FilterBarProps) {
-  const [timeBarOpen, setTimeBarOpen] = useState(true);
-  const [timeMode, setTimeMode] = useState(TIME_MODES[0]);
+export default function FilterBar({ mapRight, docOpen, toggleDoc, layers, toggleLayer, onClose, filters, setFilters, filterLayout, setFilterLayout, topInset = 56 }: FilterBarProps) {
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [timeStripOpen, setTimeStripOpen] = useState(true);
+  const floating = filterLayout === 'floating';
+  const count = activeFilterCount(filters);
+  const panelProps = { filters, setFilters, layers, onClose: () => setFiltersOpen(false) };
+  const dockedPanel = { maxHeight: 'calc(100vh - 76px)', pointerEvents: 'auto' } as const;
 
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        left: 0,
-        bottom: 16,
-        right: mapRight,
-        zIndex: 600,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 8,
-        padding: '0 12px',
-        boxSizing: 'border-box',
-        pointerEvents: 'none',
-      }}
-    >
-      {timeBarOpen && (
-        <div style={{ ...GLASS, pointerEvents: 'auto', display: 'flex', alignItems: 'center', gap: 10, height: 38, padding: '0 14px 0 8px', borderRadius: 14 }}>
-          <span style={{ font: '600 12px Assistant,sans-serif', color: '#e7edf7', whiteSpace: 'nowrap' }}>סינון זמנים</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 2, padding: 2, borderRadius: 8, background: 'rgba(0,0,0,.25)' }}>
-            {TIME_MODES.map((m) => {
-              const on = m === timeMode;
+  const bar = (
+    <div style={{ ...GLASS, pointerEvents: 'auto', flex: '0 0 auto', padding: 12, borderRadius: 18 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginBottom: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Pill active={filtersOpen} onClick={() => setFiltersOpen((v) => !v)} icon={<FilterIcon />}>
+            סינונים
+            {count > 0 && (
+              <span style={{ minWidth: 16, height: 16, padding: '0 4px', borderRadius: 8, background: '#186eff', color: '#fff', font: '700 10px/16px Assistant,sans-serif', textAlign: 'center' }}>{count}</span>
+            )}
+          </Pill>
+          <Pill icon={<TableIcon />}>טבלת ישויות</Pill>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div role="radiogroup" aria-label="תצוגת סינונים" style={{ display: 'flex', gap: 2, padding: 2, borderRadius: 7, background: 'rgba(0,0,0,.25)' }}>
+            {LAYOUTS.map((l) => {
+              const on = l.id === filterLayout;
               return (
                 <span
-                  key={m}
-                  onClick={() => setTimeMode(m)}
+                  key={l.id}
+                  role="radio"
+                  aria-checked={on}
+                  title={l.title}
+                  onClick={() => setFilterLayout(l.id)}
                   className="seg-opt"
-                  style={{
-                    height: 24,
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '0 12px',
-                    borderRadius: 6,
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap',
-                    font: `${on ? 600 : 500} 11px Assistant,sans-serif`,
-                    background: on ? '#1f6feb' : 'transparent',
-                    color: on ? '#fff' : '#9aa3b2',
-                  }}
+                  style={{ height: 20, display: 'flex', alignItems: 'center', padding: '0 8px', borderRadius: 5, cursor: 'pointer', whiteSpace: 'nowrap', font: `${on ? 600 : 500} 10.5px Assistant,sans-serif`, background: on ? 'rgba(31,111,235,.85)' : 'transparent', color: on ? '#fff' : '#9aa3b2' }}
                 >
-                  {m}
+                  {l.label}
                 </span>
               );
             })}
           </div>
-          <IconBtn title="סגירת סינון זמנים" onClick={() => setTimeBarOpen(false)}>
-            <XIcon />
-          </IconBtn>
-        </div>
-      )}
-
-      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'flex-end', gap: 10, maxWidth: '100%' }}>
-        {docOpen && <DocPanel onClose={toggleDoc} />}
-
-        <div style={{ ...GLASS, pointerEvents: 'auto', flex: '0 0 auto', padding: 12, borderRadius: 18 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginBottom: 10 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <Pill active={timeBarOpen} onClick={() => setTimeBarOpen((v) => !v)} icon={<FilterIcon />}>
-                סינונים רוחבים
-              </Pill>
-              <Pill icon={<TableIcon />}>טבלת ישויות</Pill>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <IconBtn title="רענון">
-                <RefreshIcon />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {floating && !timeStripOpen && (
+              <IconBtn title="הצגת סינון זמנים" onClick={() => setTimeStripOpen(true)}>
+                <ClockIcon />
               </IconBtn>
-              <IconBtn title="תיעוד מבצעי" onClick={toggleDoc} active={docOpen}>
-                <PencilIcon />
-              </IconBtn>
-              <IconBtn title="סגור" onClick={onClose}>
-                <XIcon />
-              </IconBtn>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'stretch', gap: 12 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 66px)', gap: 7 }}>
-              {STAT_KEYS.map((key) => {
-                const def = LAYERS.find((l) => l.key === key);
-                if (!def) return null;
-                return <StatTile key={key} def={def} on={!!layers[key]} onClick={() => toggleLayer(key)} />;
-              })}
-            </div>
-
-            <div style={{ width: 1, background: 'rgba(255,255,255,.1)' }} />
-
-            <div style={{ width: 146, display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {CAPABILITIES.map((c) => {
-                const on = c.key === 'doc' ? docOpen : !!layers[c.key];
-                return (
-                  <div
-                    key={c.key}
-                    onClick={c.key === 'doc' ? toggleDoc : () => toggleLayer(c.key)}
-                    className="bar-row"
-                    style={{
-                      flex: '1 1 0',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      padding: '0 10px',
-                      borderRadius: 8,
-                      cursor: 'pointer',
-                      background: on ? hexA(c.color, 0.18) : 'rgba(255,255,255,.07)',
-                      border: `1px solid ${on ? hexA(c.color, 0.7) : 'transparent'}`,
-                      color: on ? c.color : '#d6dce6',
-                    }}
-                  >
-                    <span style={{ display: 'flex', flex: '0 0 auto' }}>{c.icon}</span>
-                    <span style={{ font: '600 11.5px Assistant,sans-serif', color: '#e7edf7', whiteSpace: 'nowrap' }}>{c.label}</span>
-                  </div>
-                );
-              })}
-            </div>
+            )}
+            <IconBtn title="רענון">
+              <RefreshIcon />
+            </IconBtn>
+            <IconBtn title="תיעוד מבצעי" onClick={toggleDoc} active={docOpen}>
+              <PencilIcon />
+            </IconBtn>
+            <IconBtn title="סגור" onClick={onClose}>
+              <XIcon />
+            </IconBtn>
           </div>
         </div>
       </div>
+
+      <div style={{ display: 'flex', alignItems: 'stretch', gap: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 66px)', gap: 7 }}>
+          {STAT_KEYS.map((key) => {
+            const def = LAYERS.find((l) => l.key === key);
+            if (!def) return null;
+            return <StatTile key={key} def={def} on={!!layers[key]} onClick={() => toggleLayer(key)} />;
+          })}
+        </div>
+
+        <div style={{ width: 1, background: 'rgba(255,255,255,.1)' }} />
+
+        <div style={{ width: 146, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {CAPABILITIES.map((c) => {
+            const on = c.key === 'doc' ? docOpen : !!layers[c.key];
+            return (
+              <div
+                key={c.key}
+                onClick={c.key === 'doc' ? toggleDoc : () => toggleLayer(c.key)}
+                className="bar-row"
+                style={{
+                  flex: '1 1 0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '0 10px',
+                  borderRadius: 8,
+                  cursor: 'pointer',
+                  background: on ? hexA(c.color, 0.18) : 'rgba(255,255,255,.07)',
+                  border: `1px solid ${on ? hexA(c.color, 0.7) : 'transparent'}`,
+                  color: on ? c.color : '#d6dce6',
+                }}
+              >
+                <span style={{ display: 'flex', flex: '0 0 auto' }}>{c.icon}</span>
+                <span style={{ font: '600 11.5px Assistant,sans-serif', color: '#e7edf7', whiteSpace: 'nowrap' }}>{c.label}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
+  );
+
+  return (
+    <>
+      {floating && filtersOpen && (
+        <FloatingFilterPanel {...panelProps} style={{ position: 'absolute', top: topInset, left: 12, zIndex: 650, maxHeight: `calc(100% - ${topInset + 16}px)`, pointerEvents: 'auto' }} />
+      )}
+      <div
+        style={{
+          position: 'absolute',
+          left: 0,
+          bottom: 16,
+          right: mapRight,
+          zIndex: 600,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 8,
+          padding: floating && filtersOpen ? '0 12px 0 329px' : '0 12px',
+          boxSizing: 'border-box',
+          pointerEvents: 'none',
+        }}
+      >
+        {floating && timeStripOpen && (
+          <div style={{ ...GLASS, pointerEvents: 'auto', borderRadius: 14 }}>
+            <TimeStrip time={filters.time} onChange={(time) => setFilters({ ...filters, time })} onClose={() => setTimeStripOpen(false)} />
+          </div>
+        )}
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'flex-end', gap: 10, maxWidth: '100%' }}>
+          {!floating && filtersOpen && <CrossPanel {...panelProps} style={dockedPanel} />}
+          {docOpen && <DocPanel onClose={toggleDoc} />}
+          {bar}
+          {!floating && filtersOpen && <LayerTimePanel {...panelProps} style={dockedPanel} />}
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -318,6 +343,15 @@ function FilterIcon() {
   return (
     <Svg size={13}>
       <path d="M3 4h18l-7 8v6l-4 2v-8z" />
+    </Svg>
+  );
+}
+
+function ClockIcon() {
+  return (
+    <Svg size={14}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
     </Svg>
   );
 }

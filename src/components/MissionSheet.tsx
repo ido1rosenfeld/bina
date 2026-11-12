@@ -2,12 +2,17 @@ import { useEffect, useState, type ReactNode } from 'react';
 import ConfirmDialog from './ConfirmDialog';
 import MapView from './MapView';
 import FilterBar from './FilterBar';
+import type { FilterLayout, FilterState } from '../filters';
 
 interface MissionSheetProps {
   onClose: () => void;
   onToast: (msg: string) => void;
   layers: Record<string, boolean>;
   toggleLayer: (key: string) => void;
+  filters: FilterState;
+  setFilters: (f: FilterState) => void;
+  filterLayout: FilterLayout;
+  setFilterLayout: (l: FilterLayout) => void;
 }
 
 const noop = () => {};
@@ -27,7 +32,7 @@ const FIELD = {
   textAlign: 'right',
 } as const;
 
-export default function MissionSheet({ onClose, onToast, layers, toggleLayer }: MissionSheetProps) {
+export default function MissionSheet({ onClose, onToast, layers, toggleLayer, filters, setFilters, filterLayout, setFilterLayout }: MissionSheetProps) {
   const [title, setTitle] = useState('The Goat');
   const [phases, setPhases] = useState([
     { name: 'היערכות', status: 'ממתין' },
@@ -189,7 +194,7 @@ export default function MissionSheet({ onClose, onToast, layers, toggleLayer }: 
             )}
             {bina === 'on' && (
               <div className="bina-in" style={{ position: 'absolute', inset: 0, zIndex: 600, pointerEvents: 'none' }}>
-                <FilterBar mapRight="0px" docOpen={docOpen} toggleDoc={() => setDocOpen((v) => !v)} layers={layers} toggleLayer={toggleLayer} onClose={() => setBina('off')} />
+                <FilterBar mapRight="0px" docOpen={docOpen} toggleDoc={() => setDocOpen((v) => !v)} layers={layers} toggleLayer={toggleLayer} onClose={() => setBina('off')} topInset={12} filters={filters} setFilters={setFilters} filterLayout={filterLayout} setFilterLayout={setFilterLayout} />
               </div>
             )}
             {askHistory && (

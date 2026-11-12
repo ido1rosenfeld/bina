@@ -235,3 +235,18 @@ input, textarea {
     transform: rotate(360deg);
   }
 }
+
+.flt-field:hover,
+.flt-chip:hover,
+.flt-card:hover,
+.flt-btn:hover {
+  filter: brightness(1.15);
+}
+
+.flt-opt:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.flt-link:hover {
+  text-decoration: underline;
+}

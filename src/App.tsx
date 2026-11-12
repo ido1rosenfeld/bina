@@ -14,6 +14,16 @@ import JournalBar from './components/JournalBar';
 import ConfirmDialog from './components/ConfirmDialog';
 import { ENTITIES, EVENTS, INITIAL_MESSAGES, RECS, RECS_W, ROLES, SIDEBAR_W, answerFor, offsetCoord } from './data';
 import type { ChatMessage, RecItem, RoleId } from './data';
+import { EMPTY_FILTERS, type FilterLayout, type FilterState } from './filters';
+
+const LAYOUT_KEY = 'bina.filterLayout';
+function readLayout(): FilterLayout {
+  try {
+    return localStorage.getItem(LAYOUT_KEY) === 'floating' ? 'floating' : 'docked';
+  } catch {
+    return 'docked';
+  }
+}
 
 interface ReportClaim {
   id: string;
@@ -59,6 +69,17 @@ export default function App() {
   const [historyAsk, setHistoryAsk] = useState<RecItem | null>(null);
   const [historyBarOpen, setHistoryBarOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [filters, setFilters] = useState<FilterState>(EMPTY_FILTERS);
+  const [filterLayout, setFilterLayoutState] = useState<FilterLayout>(readLayout);
+
+  function setFilterLayout(l: FilterLayout) {
+    setFilterLayoutState(l);
+    try {
+      localStorage.setItem(LAYOUT_KEY, l);
+    } catch {
+      /* storage unavailable — keep in memory only */
+    }
+  }
 
   const exposure = role === 'exposure';
   const rightPanelW = aiOpen ? panelW : recsOpen ? RECS_W : 0;
@@ -210,6 +231,10 @@ export default function App() {
         toggleDoc={() => setDocOpen((v) => !v)}
         layers={layers}
         toggleLayer={toggleLayer}
+        filters={filters}
+        setFilters={setFilters}
+        filterLayout={filterLayout}
+        setFilterLayout={setFilterLayout}
       />
       )}
       {exposure && !historyBarOpen && (
@@ -264,7 +289,7 @@ export default function App() {
         </div>
       )}
       {missionOpen && (
-        <MissionSheet onClose={() => setMissionOpen(false)} onToast={showToast} layers={layers} toggleLayer={toggleLayer} />
+        <MissionSheet onClose={() => setMissionOpen(false)} onToast={showToast} layers={layers} toggleLayer={toggleLayer} filters={filters} setFilters={setFilters} filterLayout={filterLayout} setFilterLayout={setFilterLayout} />
       )}
       {toast && (
         <div dir="rtl" style={{ position: 'absolute', top: 58, left: '50%', transform: 'translateX(-50%)', zIndex: 1100, padding: '9px 16px', borderRadius: 10, background: '#1f2a3d', border: '1px solid rgba(77,141,255,.45)', color: '#e7edf7', font: '600 12.5px Assistant,sans-serif', boxShadow: '0 12px 36px rgba(0,0,0,.5)' }}>
